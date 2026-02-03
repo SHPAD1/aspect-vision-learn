@@ -23,6 +23,9 @@ export function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <img src={logo} alt="Aspect Vision" className="h-12 w-auto" />
+            <span className="font-heading text-xl font-bold text-foreground hidden sm:inline">
+              ASPECT <span className="text-primary">VISION</span>
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
