@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { GraduationCap, Mail, Phone, MapPin, Instagram, Linkedin, Youtube, Facebook } from "lucide-react";
+import { Mail, Phone, MapPin, Instagram, Linkedin, Youtube, Facebook, Globe } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 const footerLinks = {
   company: [
@@ -23,10 +24,23 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { icon: Instagram, href: "https://instagram.com", label: "Instagram" },
-  { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
-  { icon: Youtube, href: "https://youtube.com", label: "YouTube" },
-  { icon: Facebook, href: "https://facebook.com", label: "Facebook" },
+  { icon: Instagram, href: "https://instagram.com/aspectvision", label: "Instagram" },
+  { icon: Linkedin, href: "https://linkedin.com/company/aspectvision", label: "LinkedIn" },
+  { icon: Youtube, href: "https://youtube.com/@aspectvision", label: "YouTube" },
+  { icon: Facebook, href: "https://facebook.com/aspectvision", label: "Facebook" },
+];
+
+const offices = [
+  {
+    type: "Corporate Office",
+    address: "G75, Sector 63, Noida - 201309",
+    city: "Noida, UP",
+  },
+  {
+    type: "Regional Office",
+    address: "Road No. 21, Rajeev Nagar, Patna - 800024",
+    city: "Patna, Bihar",
+  },
 ];
 
 export function Footer() {
@@ -37,30 +51,39 @@ export function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-foreground">
-                <GraduationCap className="w-6 h-6" />
-              </div>
-              <span className="font-heading text-xl font-bold text-sidebar-foreground">
-                Aspect<span className="text-primary">Vision</span>
-              </span>
+              <img src={logo} alt="Aspect Vision" className="h-14 w-auto" />
             </Link>
             <p className="text-sidebar-foreground/70 text-sm leading-relaxed mb-6 max-w-sm">
-              Empowering students with industry-relevant skills through expert-led courses. 
+              When Vision Gets True Aspect. Empowering students with industry-relevant skills through expert-led courses. 
               Transform your career with Aspect Vision.
             </p>
             <div className="space-y-3">
-              <a href="mailto:hello@aspectvision.com" className="flex items-center gap-2 text-sm text-sidebar-foreground/70 hover:text-primary transition-colors">
-                <Mail className="w-4 h-4" />
-                hello@aspectvision.com
+              <a href="mailto:aspectvisionoffical@gmail.com" className="flex items-center gap-2 text-sm text-sidebar-foreground/70 hover:text-primary transition-colors">
+                <Mail className="w-4 h-4 flex-shrink-0" />
+                aspectvisionoffical@gmail.com
               </a>
-              <a href="tel:+919876543210" className="flex items-center gap-2 text-sm text-sidebar-foreground/70 hover:text-primary transition-colors">
-                <Phone className="w-4 h-4" />
-                +91 98765 43210
+              <a href="tel:+919472070758" className="flex items-center gap-2 text-sm text-sidebar-foreground/70 hover:text-primary transition-colors">
+                <Phone className="w-4 h-4 flex-shrink-0" />
+                +91 9472070758
               </a>
-              <div className="flex items-start gap-2 text-sm text-sidebar-foreground/70">
-                <MapPin className="w-4 h-4 mt-0.5" />
-                <span>Mumbai, Bangalore, Delhi</span>
-              </div>
+              <a href="https://www.aspectvision.in" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-sidebar-foreground/70 hover:text-primary transition-colors">
+                <Globe className="w-4 h-4 flex-shrink-0" />
+                www.aspectvision.in
+              </a>
+            </div>
+            
+            {/* Office Locations */}
+            <div className="mt-6 space-y-4">
+              {offices.map((office) => (
+                <div key={office.type} className="flex items-start gap-2 text-sm text-sidebar-foreground/70">
+                  <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <span className="font-medium text-sidebar-foreground">{office.type}:</span>
+                    <br />
+                    {office.address}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
