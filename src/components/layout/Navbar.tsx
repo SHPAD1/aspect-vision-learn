@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, GraduationCap } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import logo from "@/assets/logo.png";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -21,12 +22,7 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-foreground shadow-md group-hover:shadow-glow transition-shadow duration-300">
-              <GraduationCap className="w-6 h-6" />
-            </div>
-            <span className="font-heading text-xl font-bold text-foreground">
-              Aspect<span className="text-primary">Vision</span>
-            </span>
+            <img src={logo} alt="Aspect Vision" className="h-12 w-auto" />
           </Link>
 
           {/* Desktop Navigation */}
