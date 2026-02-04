@@ -84,9 +84,7 @@ function SalesSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-3 px-2 py-2">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-success text-success-foreground shrink-0">
-            <GraduationCap className="w-5 h-5" />
-          </div>
+          <img src={logo} alt="Aspect Vision" className="h-8 w-auto shrink-0" />
           {!isCollapsed && (
             <div className="flex flex-col">
               <span className="font-heading text-sm font-bold leading-none">
