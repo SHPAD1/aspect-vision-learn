@@ -34,6 +34,7 @@ import AdminYoutube from "./pages/admin/AdminYoutube";
 import AdminBatches from "./pages/admin/AdminBatches";
 import AdminCourses from "./pages/admin/AdminCourses";
 import AdminRequests from "./pages/admin/AdminRequests";
+// Sales pages
 import SalesDashboard from "./pages/sales/SalesDashboard";
 import SalesOverview from "./pages/sales/SalesOverview";
 import SalesProfile from "./pages/sales/SalesProfile";
@@ -42,6 +43,14 @@ import SalesEntry from "./pages/sales/SalesEntry";
 import SalesFollowups from "./pages/sales/SalesFollowups";
 import SalesKPI from "./pages/sales/SalesKPI";
 import SalesReport from "./pages/sales/SalesReport";
+
+// Support pages
+import SupportDashboard from "./pages/support/SupportDashboard";
+import SupportOverview from "./pages/support/SupportOverview";
+import SupportProfile from "./pages/support/SupportProfile";
+import SupportTickets from "./pages/support/SupportTickets";
+import SupportResolved from "./pages/support/SupportResolved";
+import SupportPerformance from "./pages/support/SupportPerformance";
 
 const queryClient = new QueryClient();
 
