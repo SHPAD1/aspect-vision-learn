@@ -1,52 +1,196 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate, Link, Outlet, useLocation } from "react-router-dom";
 import {
   GraduationCap,
   LogOut,
   Users,
   CreditCard,
-  FileText,
   Settings,
-  Menu,
-  X,
   Home,
   Bell,
   UserPlus,
   Building2,
-  BarChart3,
   Youtube,
   Wallet,
   TrendingUp,
   Calendar,
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+  useSidebar,
+} from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
 
-const adminSidebarLinks = [
+const mainNavItems = [
   { icon: Home, label: "Overview", href: "/admin" },
   { icon: Users, label: "Students", href: "/admin/students" },
   { icon: CreditCard, label: "Payments", href: "/admin/payments" },
+  { icon: BookOpen, label: "Batches", href: "/admin/batches" },
+];
+
+const managementItems = [
   { icon: TrendingUp, label: "Employee Performance", href: "/admin/performance" },
   { icon: Wallet, label: "Salary Management", href: "/admin/salary" },
   { icon: Calendar, label: "Weekly Reports", href: "/admin/reports" },
   { icon: Youtube, label: "YouTube Analytics", href: "/admin/youtube" },
+];
+
+const systemItems = [
   { icon: UserPlus, label: "User Management", href: "/admin/users" },
   { icon: Building2, label: "Branches", href: "/admin/branches" },
   { icon: Settings, label: "Settings", href: "/admin/settings" },
 ];
 
-const AdminDashboard = () => {
-  const { user, loading, isAdmin, signOut } = useAuth();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const navigate = useNavigate();
+function AdminSidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { user, signOut } = useAuth();
+  const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
+
+  const handleLogout = async () => {
+    await signOut();
+    toast({ title: "Logged out", description: "See you soon!" });
+    navigate("/");
+  };
+
+  const isActive = (href: string) => {
+    if (href === "/admin") {
+      return location.pathname === "/admin";
+    }
+    return location.pathname.startsWith(href);
+  };
+
+  const NavItem = ({ item }: { item: typeof mainNavItems[0] }) => (
+    <SidebarMenuItem>
+      <SidebarMenuButton
+        asChild
+        isActive={isActive(item.href)}
+        tooltip={isCollapsed ? item.label : undefined}
+      >
+        <Link to={item.href}>
+          <item.icon className="h-4 w-4" />
+          <span>{item.label}</span>
+        </Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+
+  return (
+    <Sidebar collapsible="icon">
+      <SidebarHeader className="border-b border-sidebar-border">
+        <Link to="/" className="flex items-center gap-3 px-2 py-2">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground shrink-0">
+            <GraduationCap className="w-5 h-5" />
+          </div>
+          {!isCollapsed && (
+            <div className="flex flex-col">
+              <span className="font-heading text-sm font-bold leading-none">
+                Aspect<span className="text-primary">Vision</span>
+              </span>
+              <span className="text-[10px] text-sidebar-foreground/60">
+                Admin Panel
+              </span>
+            </div>
+          )}
+        </Link>
+      </SidebarHeader>
+
+      <SidebarContent>
+        {/* Main Navigation */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Main</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {mainNavItems.map((item) => (
+                <NavItem key={item.href} item={item} />
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Management */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Management</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {managementItems.map((item) => (
+                <NavItem key={item.href} item={item} />
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* System */}
+        <SidebarGroup>
+          <SidebarGroupLabel>System</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {systemItems.map((item) => (
+                <NavItem key={item.href} item={item} />
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter className="border-t border-sidebar-border">
+        <div className="p-2">
+          {!isCollapsed && (
+            <div className="flex items-center gap-3 mb-3 px-2">
+              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                <span className="text-xs font-bold text-primary">A</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium truncate">Administrator</p>
+                <p className="text-[10px] text-sidebar-foreground/60 truncate">
+                  {user?.email}
+                </p>
+              </div>
+            </div>
+          )}
+          <Button
+            variant="ghost"
+            size={isCollapsed ? "icon" : "sm"}
+            className="w-full justify-start text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-4 w-4" />
+            {!isCollapsed && <span className="ml-2">Logout</span>}
+          </Button>
+        </div>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}
+
+const AdminDashboard = () => {
+  const { user, loading, isAdmin, isBranchAdmin } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     if (!loading && !user) {
       navigate("/auth");
-    } else if (!loading && user && !isAdmin) {
+    } else if (!loading && user && !isAdmin && !isBranchAdmin) {
       toast({
         title: "Access Denied",
         description: "You don't have admin privileges.",
@@ -54,13 +198,7 @@ const AdminDashboard = () => {
       });
       navigate("/dashboard");
     }
-  }, [loading, user, isAdmin, navigate, toast]);
-
-  const handleLogout = async () => {
-    await signOut();
-    toast({ title: "Logged out", description: "See you soon!" });
-    navigate("/");
-  };
+  }, [loading, user, isAdmin, isBranchAdmin, navigate, toast]);
 
   if (loading) {
     return (
@@ -73,130 +211,45 @@ const AdminDashboard = () => {
     );
   }
 
-  if (!isAdmin) {
+  if (!isAdmin && !isBranchAdmin) {
     return null;
   }
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Mobile Sidebar Overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-foreground/50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-sidebar text-sidebar-foreground transform transition-transform duration-300 ease-in-out lg:transform-none ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        }`}
-      >
-        <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-foreground">
-                <GraduationCap className="w-6 h-6" />
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full">
+        <AdminSidebar />
+        
+        <main className="flex-1 flex flex-col min-h-screen">
+          {/* Top Bar */}
+          <header className="sticky top-0 z-30 bg-background/95 backdrop-blur border-b border-border px-4 lg:px-6 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <SidebarTrigger />
+                <Separator orientation="vertical" className="h-6" />
+                <div>
+                  <h1 className="font-heading text-lg font-bold text-foreground">
+                    Admin Dashboard
+                  </h1>
+                  <p className="text-xs text-muted-foreground">
+                    Manage your entire system
+                  </p>
+                </div>
               </div>
-              <div>
-                <span className="font-heading text-lg font-bold">
-                  Aspect<span className="text-primary">Vision</span>
-                </span>
-                <p className="text-xs text-sidebar-foreground/60">Admin Panel</p>
-              </div>
-            </Link>
-            <button
-              className="lg:hidden p-2 rounded-lg hover:bg-sidebar-accent"
-              onClick={() => setSidebarOpen(false)}
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-            {adminSidebarLinks.map((link) => {
-              const isActive = location.pathname === link.href || 
-                (link.href !== "/admin" && location.pathname.startsWith(link.href));
-              return (
-                <Link
-                  key={link.href}
-                  to={link.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
-                    isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent"
-                  }`}
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <link.icon className="w-5 h-5" />
-                  <span className="font-medium">{link.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* User Section */}
-          <div className="p-4 border-t border-sidebar-border">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                <Settings className="w-5 h-5 text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-sm truncate">Administrator</p>
-                <p className="text-xs text-sidebar-foreground/60 truncate">
-                  {user?.email}
-                </p>
-              </div>
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full" />
+              </Button>
             </div>
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent"
-              onClick={handleLogout}
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
-          </div>
-        </div>
-      </aside>
+          </header>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col min-h-screen">
-        {/* Top Bar */}
-        <header className="sticky top-0 z-30 bg-background/95 backdrop-blur border-b border-border px-4 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                className="lg:hidden p-2 rounded-lg hover:bg-muted"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <Menu className="w-5 h-5" />
-              </button>
-              <div>
-                <h1 className="font-heading text-xl font-bold text-foreground">
-                  Admin Dashboard
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                  Manage your entire system
-                </p>
-              </div>
-            </div>
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-accent rounded-full" />
-            </Button>
+          {/* Dashboard Content */}
+          <div className="flex-1 p-4 lg:p-6 overflow-auto">
+            <Outlet />
           </div>
-        </header>
-
-        {/* Dashboard Content */}
-        <div className="flex-1 p-4 lg:p-8">
-          <Outlet />
-        </div>
-      </main>
-    </div>
+        </main>
+      </div>
+    </SidebarProvider>
   );
 };
 

@@ -22,6 +22,7 @@ import AdminBranches from "./pages/admin/AdminBranches";
 import AdminPerformance from "./pages/admin/AdminPerformance";
 import AdminSalary from "./pages/admin/AdminSalary";
 import AdminYoutube from "./pages/admin/AdminYoutube";
+import AdminBatches from "./pages/admin/AdminBatches";
 
 const queryClient = new QueryClient();
 
@@ -38,12 +39,12 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/dashboard/ai-tutor" element={<AITutor />} />
             
-            {/* Admin Routes */}
             <Route path="/admin" element={<AdminDashboard />}>
               <Route index element={<AdminOverview />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="students" element={<AdminStudents />} />
               <Route path="payments" element={<AdminPayments />} />
+              <Route path="batches" element={<AdminBatches />} />
               <Route path="performance" element={<AdminPerformance />} />
               <Route path="salary" element={<AdminSalary />} />
               <Route path="reports" element={<AdminReports />} />
