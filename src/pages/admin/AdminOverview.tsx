@@ -8,9 +8,14 @@ import {
   IndianRupee,
   GraduationCap,
   Calendar,
+  BookOpen,
+  ArrowUpRight,
+  ArrowDownRight,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
+import { format, subDays } from "date-fns";
+import { Link } from "react-router-dom";
 
 interface DashboardStats {
   totalStudents: number;
@@ -19,6 +24,15 @@ interface DashboardStats {
   todayCollection: number;
   totalEmployees: number;
   totalBranches: number;
+  totalBatches: number;
+  activeBatches: number;
+}
+
+interface RecentActivity {
+  type: "payment" | "enrollment" | "lead";
+  message: string;
+  subMessage: string;
+  time: string;
 }
 
 const AdminOverview = () => {
@@ -29,8 +43,11 @@ const AdminOverview = () => {
     todayCollection: 0,
     totalEmployees: 0,
     totalBranches: 0,
+    totalBatches: 0,
+    activeBatches: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
 
   useEffect(() => {
     fetchStats();
@@ -48,16 +65,16 @@ const AdminOverview = () => {
         todayPaymentsRes,
         employeesRes,
         branchesRes,
+        batchesRes,
+        activeBatchesRes,
+        recentLeadsRes,
       ] = await Promise.all([
         supabase.from("students").select("id", { count: "exact", head: true }),
         supabase
           .from("students")
           .select("id", { count: "exact", head: true })
           .gte("enrollment_date", today),
-        supabase
-          .from("payments")
-          .select("amount")
-          .eq("status", "completed"),
+        supabase.from("payments").select("amount").eq("status", "completed"),
         supabase
           .from("payments")
           .select("amount")
@@ -65,16 +82,23 @@ const AdminOverview = () => {
           .gte("payment_date", today),
         supabase.from("employees").select("id", { count: "exact", head: true }),
         supabase.from("branches").select("id", { count: "exact", head: true }),
+        supabase.from("batches").select("id", { count: "exact", head: true }),
+        supabase
+          .from("batches")
+          .select("id", { count: "exact", head: true })
+          .eq("is_active", true),
+        supabase
+          .from("enrollment_leads")
+          .select("student_name, created_at")
+          .order("created_at", { ascending: false })
+          .limit(5),
       ]);
 
-      const totalPayments = paymentsRes.data?.reduce(
-        (sum, p) => sum + Number(p.amount),
-        0
-      ) || 0;
-      const todayCollection = todayPaymentsRes.data?.reduce(
-        (sum, p) => sum + Number(p.amount),
-        0
-      ) || 0;
+      const totalPayments =
+        paymentsRes.data?.reduce((sum, p) => sum + Number(p.amount), 0) || 0;
+      const todayCollection =
+        todayPaymentsRes.data?.reduce((sum, p) => sum + Number(p.amount), 0) ||
+        0;
 
       setStats({
         totalStudents: studentsRes.count || 0,
@@ -83,7 +107,20 @@ const AdminOverview = () => {
         todayCollection,
         totalEmployees: employeesRes.count || 0,
         totalBranches: branchesRes.count || 0,
+        totalBatches: batchesRes.count || 0,
+        activeBatches: activeBatchesRes.count || 0,
       });
+
+      // Create recent activities from leads
+      const activities: RecentActivity[] = (recentLeadsRes.data || []).map(
+        (lead) => ({
+          type: "lead" as const,
+          message: `New inquiry from ${lead.student_name}`,
+          subMessage: "Enrollment lead",
+          time: format(new Date(lead.created_at), "HH:mm"),
+        })
+      );
+      setRecentActivities(activities);
     } catch (error) {
       console.error("Error fetching stats:", error);
     } finally {
@@ -97,28 +134,40 @@ const AdminOverview = () => {
       value: stats.totalStudents,
       icon: GraduationCap,
       color: "bg-primary/10 text-primary",
-      subLabel: `+${stats.todayEnrollments} today`,
+      subValue: `+${stats.todayEnrollments}`,
+      subLabel: "today",
+      trend: stats.todayEnrollments > 0 ? "up" : "neutral",
+      href: "/admin/students",
     },
     {
       label: "Today's Collection",
       value: `₹${stats.todayCollection.toLocaleString()}`,
       icon: IndianRupee,
       color: "bg-success/10 text-success",
-      subLabel: `Total: ₹${stats.totalPayments.toLocaleString()}`,
+      subValue: `₹${(stats.totalPayments / 1000).toFixed(0)}K`,
+      subLabel: "total",
+      trend: "up",
+      href: "/admin/payments",
     },
     {
       label: "Total Employees",
       value: stats.totalEmployees,
       icon: Users,
       color: "bg-info/10 text-info",
-      subLabel: "Active staff",
+      subValue: "",
+      subLabel: "active staff",
+      trend: "neutral",
+      href: "/admin/users",
     },
     {
-      label: "Branches",
-      value: stats.totalBranches,
-      icon: Building2,
+      label: "Active Batches",
+      value: stats.activeBatches,
+      icon: BookOpen,
       color: "bg-warning/10 text-warning",
-      subLabel: "Locations",
+      subValue: `/${stats.totalBatches}`,
+      subLabel: "total",
+      trend: "neutral",
+      href: "/admin/batches",
     },
   ];
 
@@ -141,94 +190,209 @@ const AdminOverview = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((stat) => (
-          <div key={stat.label} className="card-elevated p-5">
-            <div
-              className={`w-10 h-10 rounded-xl ${stat.color} flex items-center justify-center mb-3`}
-            >
-              <stat.icon className="w-5 h-5" />
+          <Link
+            key={stat.label}
+            to={stat.href}
+            className="card-elevated p-5 hover:shadow-lg transition-shadow group"
+          >
+            <div className="flex items-start justify-between">
+              <div
+                className={`w-10 h-10 rounded-xl ${stat.color} flex items-center justify-center`}
+              >
+                <stat.icon className="w-5 h-5" />
+              </div>
+              {stat.trend === "up" && (
+                <div className="flex items-center text-success text-xs">
+                  <ArrowUpRight className="w-3 h-3" />
+                </div>
+              )}
             </div>
-            <p className="text-2xl font-heading font-bold text-foreground">
-              {stat.value}
-            </p>
-            <p className="text-sm text-muted-foreground">{stat.label}</p>
-            <p className="text-xs text-muted-foreground mt-1">{stat.subLabel}</p>
-          </div>
+            <div className="mt-3">
+              <p className="text-2xl font-heading font-bold text-foreground">
+                {stat.value}
+                {stat.subValue && (
+                  <span className="text-sm font-normal text-muted-foreground ml-1">
+                    {stat.subValue}
+                  </span>
+                )}
+              </p>
+              <p className="text-sm text-muted-foreground">{stat.label}</p>
+            </div>
+          </Link>
         ))}
       </div>
 
-      {/* Quick Actions Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="card-elevated p-6">
+      {/* Quick Actions & Activity Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Quick Actions */}
+        <div className="lg:col-span-2">
           <h3 className="font-heading text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
             <UserPlus className="w-5 h-5 text-primary" />
             Quick Actions
           </h3>
-          <div className="grid grid-cols-2 gap-3">
-            <a
-              href="/admin/users"
-              className="p-4 rounded-xl bg-muted hover:bg-muted/80 transition-colors text-center"
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <Link
+              to="/admin/users"
+              className="card-elevated p-4 hover:bg-muted/50 transition-colors text-center group"
             >
-              <Users className="w-6 h-6 mx-auto mb-2 text-primary" />
-              <p className="text-sm font-medium">Add User</p>
-            </a>
-            <a
-              href="/admin/students"
-              className="p-4 rounded-xl bg-muted hover:bg-muted/80 transition-colors text-center"
+              <div className="w-12 h-12 mx-auto mb-2 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Users className="w-6 h-6 text-primary" />
+              </div>
+              <p className="text-sm font-medium">Manage Users</p>
+            </Link>
+            <Link
+              to="/admin/students"
+              className="card-elevated p-4 hover:bg-muted/50 transition-colors text-center group"
             >
-              <GraduationCap className="w-6 h-6 mx-auto mb-2 text-success" />
-              <p className="text-sm font-medium">New Student</p>
-            </a>
-            <a
-              href="/admin/payments"
-              className="p-4 rounded-xl bg-muted hover:bg-muted/80 transition-colors text-center"
+              <div className="w-12 h-12 mx-auto mb-2 rounded-xl bg-success/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <GraduationCap className="w-6 h-6 text-success" />
+              </div>
+              <p className="text-sm font-medium">View Students</p>
+            </Link>
+            <Link
+              to="/admin/payments"
+              className="card-elevated p-4 hover:bg-muted/50 transition-colors text-center group"
             >
-              <CreditCard className="w-6 h-6 mx-auto mb-2 text-warning" />
-              <p className="text-sm font-medium">Record Payment</p>
-            </a>
-            <a
-              href="/admin/reports"
-              className="p-4 rounded-xl bg-muted hover:bg-muted/80 transition-colors text-center"
+              <div className="w-12 h-12 mx-auto mb-2 rounded-xl bg-warning/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <CreditCard className="w-6 h-6 text-warning" />
+              </div>
+              <p className="text-sm font-medium">Payments</p>
+            </Link>
+            <Link
+              to="/admin/batches"
+              className="card-elevated p-4 hover:bg-muted/50 transition-colors text-center group"
             >
-              <Calendar className="w-6 h-6 mx-auto mb-2 text-info" />
-              <p className="text-sm font-medium">View Reports</p>
-            </a>
+              <div className="w-12 h-12 mx-auto mb-2 rounded-xl bg-info/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <BookOpen className="w-6 h-6 text-info" />
+              </div>
+              <p className="text-sm font-medium">Batches</p>
+            </Link>
+          </div>
+
+          {/* Secondary Actions */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3">
+            <Link
+              to="/admin/performance"
+              className="card-elevated p-3 hover:bg-muted/50 transition-colors flex items-center gap-2"
+            >
+              <TrendingUp className="w-4 h-4 text-primary" />
+              <span className="text-sm">Performance</span>
+            </Link>
+            <Link
+              to="/admin/salary"
+              className="card-elevated p-3 hover:bg-muted/50 transition-colors flex items-center gap-2"
+            >
+              <IndianRupee className="w-4 h-4 text-success" />
+              <span className="text-sm">Salary</span>
+            </Link>
+            <Link
+              to="/admin/reports"
+              className="card-elevated p-3 hover:bg-muted/50 transition-colors flex items-center gap-2"
+            >
+              <Calendar className="w-4 h-4 text-warning" />
+              <span className="text-sm">Reports</span>
+            </Link>
+            <Link
+              to="/admin/branches"
+              className="card-elevated p-3 hover:bg-muted/50 transition-colors flex items-center gap-2"
+            >
+              <Building2 className="w-4 h-4 text-info" />
+              <span className="text-sm">Branches</span>
+            </Link>
           </div>
         </div>
 
-        <div className="card-elevated p-6">
+        {/* Recent Activity */}
+        <div>
           <h3 className="font-heading text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-success" />
             Recent Activity
           </h3>
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-              <div className="w-8 h-8 rounded-full bg-success/20 flex items-center justify-center">
-                <CreditCard className="w-4 h-4 text-success" />
-              </div>
-              <div>
-                <p className="text-sm font-medium">Payment received</p>
-                <p className="text-xs text-muted-foreground">₹15,000 - Full Stack Course</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                <UserPlus className="w-4 h-4 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-medium">New enrollment</p>
-                <p className="text-xs text-muted-foreground">Data Science - Noida</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-              <div className="w-8 h-8 rounded-full bg-info/20 flex items-center justify-center">
-                <Building2 className="w-4 h-4 text-info" />
-              </div>
-              <div>
-                <p className="text-sm font-medium">Branch update</p>
-                <p className="text-xs text-muted-foreground">Patna batch started</p>
-              </div>
-            </div>
+          <div className="card-elevated p-4 space-y-3">
+            {recentActivities.length > 0 ? (
+              recentActivities.map((activity, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50"
+                >
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <UserPlus className="w-4 h-4 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">
+                      {activity.message}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {activity.subMessage}
+                    </p>
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {activity.time}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                No recent activity
+              </p>
+            )}
           </div>
+        </div>
+      </div>
+
+      {/* Summary Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="card-elevated p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="font-semibold">Branches Overview</h4>
+            <Building2 className="w-5 h-5 text-muted-foreground" />
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-bold">{stats.totalBranches}</span>
+            <span className="text-muted-foreground">active locations</span>
+          </div>
+          <Link
+            to="/admin/branches"
+            className="text-sm text-primary hover:underline mt-2 inline-block"
+          >
+            Manage branches →
+          </Link>
+        </div>
+
+        <div className="card-elevated p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="font-semibold">Total Revenue</h4>
+            <CreditCard className="w-5 h-5 text-muted-foreground" />
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-bold text-success">
+              ₹{(stats.totalPayments / 1000).toFixed(0)}K
+            </span>
+            <span className="text-muted-foreground">collected</span>
+          </div>
+          <Link
+            to="/admin/payments"
+            className="text-sm text-primary hover:underline mt-2 inline-block"
+          >
+            View details →
+          </Link>
+        </div>
+
+        <div className="card-elevated p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="font-semibold">Team Size</h4>
+            <Users className="w-5 h-5 text-muted-foreground" />
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl font-bold">{stats.totalEmployees}</span>
+            <span className="text-muted-foreground">employees</span>
+          </div>
+          <Link
+            to="/admin/performance"
+            className="text-sm text-primary hover:underline mt-2 inline-block"
+          >
+            View performance →
+          </Link>
         </div>
       </div>
     </div>
