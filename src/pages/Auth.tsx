@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { GraduationCap, Mail, Lock, User, Loader2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -51,6 +51,31 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Check if already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        // Check user role and redirect accordingly
+        const { data: roles } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", session.user.id);
+        
+        const userRoles = roles?.map(r => r.role) || [];
+        
+        if (userRoles.includes("admin")) {
+          navigate("/admin");
+        } else if (userRoles.includes("branch_admin")) {
+          navigate("/admin"); // Branch admins also go to admin panel with limited access
+        } else {
+          navigate("/dashboard");
+        }
+      }
+    };
+    checkSession();
+  }, [navigate]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
@@ -75,10 +100,26 @@ const Auth = () => {
 
       if (error) throw error;
 
+      // Fetch user roles to determine redirect
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", data.user.id);
+
+      const userRoles = roles?.map(r => r.role) || [];
+
       toast({ title: "Welcome back!", description: "Login successful." });
       
-      // Redirect based on role (we'll check roles in the dashboard)
-      navigate("/dashboard");
+      // Redirect based on role
+      if (userRoles.includes("admin")) {
+        navigate("/admin");
+      } else if (userRoles.includes("branch_admin")) {
+        navigate("/admin");
+      } else if (userRoles.includes("teacher") || userRoles.includes("sales") || userRoles.includes("support")) {
+        navigate("/dashboard"); // Employee dashboard (can be extended later)
+      } else {
+        navigate("/dashboard");
+      }
     } catch (error: any) {
       toast({
         title: "Login Failed",

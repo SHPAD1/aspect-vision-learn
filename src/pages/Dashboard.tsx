@@ -15,9 +15,8 @@ import {
   Bell,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import type { User as SupabaseUser, Session } from "@supabase/supabase-js";
 
 const sidebarLinks = [
   { icon: Home, label: "Dashboard", href: "/dashboard" },
@@ -30,40 +29,26 @@ const sidebarLinks = [
 ];
 
 const Dashboard = () => {
-  const [user, setUser] = useState<SupabaseUser | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading, isAdmin, signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    // Set up auth state listener first
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
+    if (!loading && !user) {
+      navigate("/auth");
+    }
+    // If user is admin, redirect to admin dashboard
+    if (!loading && user && isAdmin) {
+      navigate("/admin");
+    }
+  }, [loading, user, isAdmin, navigate]);
 
-        if (!session) {
-          navigate("/auth");
-        }
-      }
-    );
-
-    // Then check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-
-      if (!session) {
-        navigate("/auth");
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+  const handleLogout = async () => {
+    await signOut();
+    toast({ title: "Logged out", description: "See you soon!" });
+    navigate("/");
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
