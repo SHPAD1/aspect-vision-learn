@@ -50,11 +50,6 @@ const Dashboard = () => {
     navigate("/");
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast({ title: "Logged out", description: "See you soon!" });
-    navigate("/");
-  };
 
   if (loading) {
     return (
