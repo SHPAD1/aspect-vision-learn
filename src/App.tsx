@@ -33,8 +33,7 @@ import AdminSalary from "./pages/admin/AdminSalary";
 import AdminYoutube from "./pages/admin/AdminYoutube";
 import AdminBatches from "./pages/admin/AdminBatches";
 import AdminCourses from "./pages/admin/AdminCourses";
-
-// Sales pages
+import AdminRequests from "./pages/admin/AdminRequests";
 import SalesDashboard from "./pages/sales/SalesDashboard";
 import SalesOverview from "./pages/sales/SalesOverview";
 import SalesProfile from "./pages/sales/SalesProfile";
