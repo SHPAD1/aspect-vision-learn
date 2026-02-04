@@ -7,10 +7,11 @@ import {
   Trash2,
   Ban,
   CheckCircle,
-  Mail,
   Phone,
   Shield,
   Loader2,
+  UserPlus,
+  UserX,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +21,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
@@ -64,6 +64,7 @@ interface UserWithRoles {
   city: string | null;
   roles: AppRole[];
   created_at: string;
+  is_blocked?: boolean;
 }
 
 const roleColors: Record<AppRole, string> = {
@@ -83,11 +84,13 @@ const AdminUsers = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isBlockDialogOpen, setIsBlockDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserWithRoles | null>(null);
   const [formLoading, setFormLoading] = useState(false);
   const [formData, setFormData] = useState({
     full_name: "",
     email: "",
+    password: "",
     phone: "",
     city: "",
     role: "student" as AppRole,
@@ -127,6 +130,7 @@ const AdminUsers = () => {
           ?.filter((r) => r.user_id === profile.user_id)
           .map((r) => r.role) || [],
         created_at: profile.created_at,
+        is_blocked: false, // We'll track this in profile or separate table if needed
       }));
 
       setUsers(usersWithRoles);
@@ -142,11 +146,97 @@ const AdminUsers = () => {
     }
   };
 
+  const resetForm = () => {
+    setFormData({
+      full_name: "",
+      email: "",
+      password: "",
+      phone: "",
+      city: "",
+      role: "student",
+    });
+  };
+
+  const handleAddUser = async () => {
+    if (!formData.full_name.trim() || !formData.email.trim() || !formData.password.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Name, email, and password are required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      toast({
+        title: "Validation Error",
+        description: "Password must be at least 6 characters",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setFormLoading(true);
+    try {
+      // Create auth user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email.trim(),
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.full_name.trim(),
+          },
+        },
+      });
+
+      if (authError) throw authError;
+
+      if (authData.user) {
+        // Create profile
+        const { error: profileError } = await supabase.from("profiles").insert({
+          user_id: authData.user.id,
+          full_name: formData.full_name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim() || null,
+          city: formData.city.trim() || null,
+        });
+
+        if (profileError) throw profileError;
+
+        // Assign role
+        const { error: roleError } = await supabase.from("user_roles").insert({
+          user_id: authData.user.id,
+          role: formData.role,
+        });
+
+        if (roleError) throw roleError;
+
+        toast({
+          title: "Success",
+          description: "User created successfully. They will receive a confirmation email.",
+        });
+        setIsAddDialogOpen(false);
+        resetForm();
+        fetchUsers();
+      }
+    } catch (error: any) {
+      console.error("Error creating user:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create user",
+        variant: "destructive",
+      });
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
   const handleEditUser = (user: UserWithRoles) => {
     setSelectedUser(user);
     setFormData({
       full_name: user.full_name,
       email: user.email,
+      password: "",
       phone: user.phone || "",
       city: user.city || "",
       role: user.roles[0] || "student",
@@ -198,6 +288,37 @@ const AdminUsers = () => {
     }
   };
 
+  const handleBlockUser = async () => {
+    if (!selectedUser) return;
+    setFormLoading(true);
+
+    try {
+      // Remove all roles to effectively block the user
+      const { error } = await supabase
+        .from("user_roles")
+        .delete()
+        .eq("user_id", selectedUser.user_id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `User "${selectedUser.full_name}" has been blocked. They will no longer have access.`,
+      });
+      setIsBlockDialogOpen(false);
+      fetchUsers();
+    } catch (error: any) {
+      console.error("Error blocking user:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to block user",
+        variant: "destructive",
+      });
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
   const handleDeleteUser = async () => {
     if (!selectedUser) return;
     setFormLoading(true);
@@ -232,25 +353,6 @@ const AdminUsers = () => {
     }
   };
 
-  const handleAddRole = async (userId: string, role: AppRole) => {
-    try {
-      const { error } = await supabase
-        .from("user_roles")
-        .insert({ user_id: userId, role });
-
-      if (error) throw error;
-
-      toast({ title: "Success", description: `Role ${role} added` });
-      fetchUsers();
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to add role",
-        variant: "destructive",
-      });
-    }
-  };
-
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -279,6 +381,64 @@ const AdminUsers = () => {
           <p className="text-muted-foreground">
             Create, edit, block, and delete user accounts
           </p>
+        </div>
+        <Button onClick={() => setIsAddDialogOpen(true)}>
+          <UserPlus className="w-4 h-4 mr-2" />
+          Add New User
+        </Button>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <div className="card-elevated p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Users className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">{users.length}</p>
+              <p className="text-sm text-muted-foreground">Total Users</p>
+            </div>
+          </div>
+        </div>
+        <div className="card-elevated p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
+              <CheckCircle className="w-5 h-5 text-success" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">
+                {users.filter((u) => u.roles.length > 0).length}
+              </p>
+              <p className="text-sm text-muted-foreground">Active Users</p>
+            </div>
+          </div>
+        </div>
+        <div className="card-elevated p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-warning/10 flex items-center justify-center">
+              <UserX className="w-5 h-5 text-warning" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">
+                {users.filter((u) => u.roles.length === 0).length}
+              </p>
+              <p className="text-sm text-muted-foreground">Blocked Users</p>
+            </div>
+          </div>
+        </div>
+        <div className="card-elevated p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-destructive" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">
+                {users.filter((u) => u.roles.includes("admin")).length}
+              </p>
+              <p className="text-sm text-muted-foreground">Admins</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -318,13 +478,14 @@ const AdminUsers = () => {
               <TableHead>Contact</TableHead>
               <TableHead>Roles</TableHead>
               <TableHead>City</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredUsers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8">
+                <TableCell colSpan={6} className="text-center py-8">
                   <p className="text-muted-foreground">No users found</p>
                 </TableCell>
               </TableRow>
@@ -371,9 +532,9 @@ const AdminUsers = () => {
                           </Badge>
                         ))
                       ) : (
-                        <span className="text-muted-foreground text-sm">
-                          No role
-                        </span>
+                        <Badge variant="secondary" className="bg-destructive/10 text-destructive">
+                          Blocked
+                        </Badge>
                       )}
                     </div>
                   </TableCell>
@@ -382,14 +543,40 @@ const AdminUsers = () => {
                       {user.city || "-"}
                     </span>
                   </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant="secondary"
+                      className={
+                        user.roles.length > 0
+                          ? "bg-success/10 text-success"
+                          : "bg-destructive/10 text-destructive"
+                      }
+                    >
+                      {user.roles.length > 0 ? "Active" : "Blocked"}
+                    </Badge>
+                  </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
                       <Button
                         variant="ghost"
                         size="icon"
                         onClick={() => handleEditUser(user)}
+                        title="Edit User"
                       >
                         <Edit2 className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className={user.roles.length > 0 ? "text-warning hover:text-warning" : "text-success hover:text-success"}
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setIsBlockDialogOpen(true);
+                        }}
+                        title={user.roles.length > 0 ? "Block User" : "User is blocked"}
+                        disabled={user.roles.length === 0}
+                      >
+                        <Ban className="w-4 h-4" />
                       </Button>
                       <Button
                         variant="ghost"
@@ -399,6 +586,7 @@ const AdminUsers = () => {
                           setSelectedUser(user);
                           setIsDeleteDialogOpen(true);
                         }}
+                        title="Delete User"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -410,6 +598,107 @@ const AdminUsers = () => {
           </TableBody>
         </Table>
       </div>
+
+      {/* Add User Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New User</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="add-name">Full Name *</Label>
+              <Input
+                id="add-name"
+                value={formData.full_name}
+                onChange={(e) =>
+                  setFormData({ ...formData, full_name: e.target.value })
+                }
+                placeholder="Enter full name"
+              />
+            </div>
+            <div>
+              <Label htmlFor="add-email">Email *</Label>
+              <Input
+                id="add-email"
+                type="email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                placeholder="Enter email address"
+              />
+            </div>
+            <div>
+              <Label htmlFor="add-password">Password *</Label>
+              <Input
+                id="add-password"
+                type="password"
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                placeholder="Minimum 6 characters"
+              />
+            </div>
+            <div>
+              <Label htmlFor="add-phone">Phone</Label>
+              <Input
+                id="add-phone"
+                value={formData.phone}
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
+                placeholder="Enter phone number"
+              />
+            </div>
+            <div>
+              <Label htmlFor="add-city">City</Label>
+              <Input
+                id="add-city"
+                value={formData.city}
+                onChange={(e) =>
+                  setFormData({ ...formData, city: e.target.value })
+                }
+                placeholder="Enter city"
+              />
+            </div>
+            <div>
+              <Label htmlFor="add-role">Role *</Label>
+              <Select
+                value={formData.role}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, role: value as AppRole })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="branch_admin">Branch Admin</SelectItem>
+                  <SelectItem value="teacher">Teacher</SelectItem>
+                  <SelectItem value="sales">Sales</SelectItem>
+                  <SelectItem value="support">Support</SelectItem>
+                  <SelectItem value="student">Student</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddUser} disabled={formLoading}>
+              {formLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                "Add User"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Edit User Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
@@ -497,13 +786,40 @@ const AdminUsers = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Block User Dialog */}
+      <AlertDialog open={isBlockDialogOpen} onOpenChange={setIsBlockDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Block User?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to block "{selectedUser?.full_name}"? This
+              will remove all their roles and they will no longer be able to
+              access the system.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBlockUser}
+              className="bg-warning hover:bg-warning/90"
+            >
+              {formLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                "Block User"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete User</AlertDialogTitle>
+            <AlertDialogTitle>Delete User?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete {selectedUser?.full_name}? This
+              Are you sure you want to delete "{selectedUser?.full_name}"? This
               action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -511,12 +827,12 @@ const AdminUsers = () => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteUser}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-destructive hover:bg-destructive/90"
             >
               {formLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                "Delete"
+                "Delete User"
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

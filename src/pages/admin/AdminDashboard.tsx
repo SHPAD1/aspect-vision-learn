@@ -43,6 +43,7 @@ const mainNavItems = [
   { icon: Users, label: "Students", href: "/admin/students" },
   { icon: CreditCard, label: "Payments", href: "/admin/payments" },
   { icon: BookOpen, label: "Batches", href: "/admin/batches" },
+  { icon: BookOpen, label: "Courses", href: "/admin/courses" },
 ];
 
 const managementItems = [
