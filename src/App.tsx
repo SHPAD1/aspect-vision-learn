@@ -31,6 +31,7 @@ import AdminPerformance from "./pages/admin/AdminPerformance";
 import AdminSalary from "./pages/admin/AdminSalary";
 import AdminYoutube from "./pages/admin/AdminYoutube";
 import AdminBatches from "./pages/admin/AdminBatches";
+import AdminCourses from "./pages/admin/AdminCourses";
 
 const queryClient = new QueryClient();
 
