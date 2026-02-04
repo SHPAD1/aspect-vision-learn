@@ -89,9 +89,7 @@ const StudentDashboard = () => {
           {/* Logo */}
           <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
             <Link to="/" className="flex items-center gap-2">
-              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-foreground">
-                <GraduationCap className="w-6 h-6" />
-              </div>
+              <img src={logo} alt="Aspect Vision" className="h-10 w-auto" />
               <span className="font-heading text-lg font-bold">
                 Aspect<span className="text-primary">Vision</span>
               </span>
