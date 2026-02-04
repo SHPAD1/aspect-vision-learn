@@ -105,6 +105,15 @@ const App = () => (
               <Route path="report" element={<SalesReport />} />
             </Route>
             
+            {/* Support Dashboard */}
+            <Route path="/support" element={<SupportDashboard />}>
+              <Route index element={<SupportOverview />} />
+              <Route path="profile" element={<SupportProfile />} />
+              <Route path="tickets" element={<SupportTickets />} />
+              <Route path="resolved" element={<SupportResolved />} />
+              <Route path="performance" element={<SupportPerformance />} />
+            </Route>
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

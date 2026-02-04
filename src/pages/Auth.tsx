@@ -106,7 +106,7 @@ const Auth = () => {
       } else if (userRoles.includes("teacher")) {
         navigate("/dashboard"); // Can extend to teacher dashboard later
       } else if (userRoles.includes("support")) {
-        navigate("/dashboard"); // Can extend to support dashboard later
+        navigate("/support");
       } else {
         navigate("/dashboard");
       }
