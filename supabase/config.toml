@@ -2,3 +2,6 @@ project_id = "addrntjbmeiuovncfeup"
 
 [functions.ai-tutor]
 verify_jwt = false
+
+[functions.create-course-payment]
+verify_jwt = false

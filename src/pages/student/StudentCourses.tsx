@@ -154,7 +154,9 @@ const StudentCourses = () => {
           <p className="text-muted-foreground mb-4">
             You haven't enrolled in any courses yet.
           </p>
-          <Button>Browse Courses</Button>
+          <Button asChild>
+            <a href="/dashboard/browse">Browse Courses</a>
+          </Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
