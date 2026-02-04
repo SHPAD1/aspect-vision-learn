@@ -6,9 +6,17 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
 import AITutor from "./pages/AITutor";
 import NotFound from "./pages/NotFound";
+
+// Student pages
+import StudentDashboard from "./pages/student/StudentDashboard";
+import StudentOverview from "./pages/student/StudentOverview";
+import StudentProfile from "./pages/student/StudentProfile";
+import StudentCourses from "./pages/student/StudentCourses";
+import StudentPayments from "./pages/student/StudentPayments";
+import StudentReports from "./pages/student/StudentReports";
+import StudentIDCard from "./pages/student/StudentIDCard";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -36,9 +44,19 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/dashboard/ai-tutor" element={<AITutor />} />
+            <Route path="/ai-tutor" element={<AITutor />} />
             
+            {/* Student Dashboard */}
+            <Route path="/dashboard" element={<StudentDashboard />}>
+              <Route index element={<StudentOverview />} />
+              <Route path="profile" element={<StudentProfile />} />
+              <Route path="courses" element={<StudentCourses />} />
+              <Route path="payments" element={<StudentPayments />} />
+              <Route path="reports" element={<StudentReports />} />
+              <Route path="id-card" element={<StudentIDCard />} />
+            </Route>
+            
+            {/* Admin Dashboard */}
             <Route path="/admin" element={<AdminDashboard />}>
               <Route index element={<AdminOverview />} />
               <Route path="users" element={<AdminUsers />} />

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, Outlet, useLocation } from "react-router-dom";
 import {
   GraduationCap,
   LogOut,
@@ -25,20 +25,20 @@ const sidebarLinks = [
   { icon: CreditCard, label: "Payments", href: "/dashboard/payments" },
   { icon: FileText, label: "Reports", href: "/dashboard/reports" },
   { icon: IdCard, label: "ID Card", href: "/dashboard/id-card" },
-  { icon: MessageCircle, label: "AI Tutor", href: "/dashboard/ai-tutor" },
+  { icon: MessageCircle, label: "AI Tutor", href: "/ai-tutor" },
 ];
 
-const Dashboard = () => {
+const StudentDashboard = () => {
   const { user, loading, isAdmin, signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
 
   useEffect(() => {
     if (!loading && !user) {
       navigate("/auth");
     }
-    // If user is admin, redirect to admin dashboard
     if (!loading && user && isAdmin) {
       navigate("/admin");
     }
@@ -48,6 +48,13 @@ const Dashboard = () => {
     await signOut();
     toast({ title: "Logged out", description: "See you soon!" });
     navigate("/");
+  };
+
+  const isActiveRoute = (href: string) => {
+    if (href === "/dashboard") {
+      return location.pathname === "/dashboard";
+    }
+    return location.pathname.startsWith(href);
   };
 
   if (loading) {
@@ -102,7 +109,11 @@ const Dashboard = () => {
               <Link
                 key={link.href}
                 to={link.href}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+                  isActiveRoute(link.href)
+                    ? "bg-primary text-primary-foreground"
+                    : "text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent"
+                }`}
                 onClick={() => setSidebarOpen(false)}
               >
                 <link.icon className="w-5 h-5" />
@@ -152,10 +163,15 @@ const Dashboard = () => {
               </button>
               <div>
                 <h1 className="font-heading text-xl font-bold text-foreground">
-                  Welcome back!
+                  {sidebarLinks.find(l => isActiveRoute(l.href))?.label || "Dashboard"}
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  Here's your learning overview
+                  {new Date().toLocaleDateString("en-US", { 
+                    weekday: "long", 
+                    year: "numeric", 
+                    month: "long", 
+                    day: "numeric" 
+                  })}
                 </p>
               </div>
             </div>
@@ -166,116 +182,13 @@ const Dashboard = () => {
           </div>
         </header>
 
-        {/* Dashboard Content */}
+        {/* Page Content */}
         <div className="flex-1 p-4 lg:p-8">
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {[
-              { label: "Enrolled Courses", value: "3", icon: BookOpen, color: "bg-primary/10 text-primary" },
-              { label: "Completed", value: "1", icon: FileText, color: "bg-success/10 text-success" },
-              { label: "In Progress", value: "2", icon: BookOpen, color: "bg-warning/10 text-warning" },
-              { label: "Certificates", value: "1", icon: IdCard, color: "bg-info/10 text-info" },
-            ].map((stat) => (
-              <div key={stat.label} className="card-elevated p-5">
-                <div className={`w-10 h-10 rounded-xl ${stat.color} flex items-center justify-center mb-3`}>
-                  <stat.icon className="w-5 h-5" />
-                </div>
-                <p className="text-2xl font-heading font-bold text-foreground">{stat.value}</p>
-                <p className="text-sm text-muted-foreground">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Continue Learning */}
-            <div className="lg:col-span-2">
-              <h2 className="font-heading text-lg font-semibold text-foreground mb-4">
-                Continue Learning
-              </h2>
-              <div className="space-y-4">
-                {[
-                  {
-                    title: "Full Stack Web Development",
-                    progress: 45,
-                    nextLesson: "React Hooks Deep Dive",
-                  },
-                  {
-                    title: "Data Science & Analytics",
-                    progress: 20,
-                    nextLesson: "Introduction to Pandas",
-                  },
-                ].map((course) => (
-                  <div key={course.title} className="card-elevated p-5">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h3 className="font-medium text-foreground">{course.title}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Next: {course.nextLesson}
-                        </p>
-                      </div>
-                      <Button size="sm">Continue</Button>
-                    </div>
-                    <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-primary rounded-full transition-all"
-                        style={{ width: `${course.progress}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      {course.progress}% complete
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div>
-              <h2 className="font-heading text-lg font-semibold text-foreground mb-4">
-                Quick Actions
-              </h2>
-              <div className="space-y-3">
-                <Link to="/dashboard/ai-tutor">
-                  <div className="card-interactive p-4 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
-                      <MessageCircle className="w-5 h-5 text-accent" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground">Ask AI Tutor</p>
-                      <p className="text-xs text-muted-foreground">Get instant help</p>
-                    </div>
-                  </div>
-                </Link>
-                <Link to="/dashboard/id-card">
-                  <div className="card-interactive p-4 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                      <IdCard className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground">Download ID Card</p>
-                      <p className="text-xs text-muted-foreground">Digital student ID</p>
-                    </div>
-                  </div>
-                </Link>
-                <Link to="/dashboard/payments">
-                  <div className="card-interactive p-4 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
-                      <CreditCard className="w-5 h-5 text-success" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground">View Payments</p>
-                      <p className="text-xs text-muted-foreground">Fee history</p>
-                    </div>
-                  </div>
-                </Link>
-              </div>
-            </div>
-          </div>
+          <Outlet />
         </div>
       </main>
     </div>
   );
 };
 
-export default Dashboard;
+export default StudentDashboard;
