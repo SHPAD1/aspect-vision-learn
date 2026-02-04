@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, Link, Outlet, useLocation } from "react-router-dom";
 import {
-  GraduationCap,
   LogOut,
   Users,
   CreditCard,
@@ -15,8 +14,7 @@ import {
   TrendingUp,
   Calendar,
   BookOpen,
-  ChevronLeft,
-  ChevronRight,
+  FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -37,6 +35,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
+import logo from "@/assets/logo.png";
 
 const mainNavItems = [
   { icon: Home, label: "Overview", href: "/admin" },
@@ -44,6 +43,7 @@ const mainNavItems = [
   { icon: CreditCard, label: "Payments", href: "/admin/payments" },
   { icon: BookOpen, label: "Batches", href: "/admin/batches" },
   { icon: BookOpen, label: "Courses", href: "/admin/courses" },
+  { icon: FileText, label: "Requests", href: "/admin/requests" },
 ];
 
 const managementItems = [
