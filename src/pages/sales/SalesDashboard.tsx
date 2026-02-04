@@ -143,14 +143,14 @@ function SalesSidebar() {
 }
 
 const SalesDashboard = () => {
-  const { user, loading, userRole } = useAuth();
+  const { user, loading, isSales, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     if (!loading && !user) {
       navigate("/auth");
-    } else if (!loading && user && userRole !== "sales" && userRole !== "admin") {
+    } else if (!loading && user && !isSales && !isAdmin) {
       toast({
         title: "Access Denied",
         description: "You don't have sales privileges.",
@@ -158,7 +158,7 @@ const SalesDashboard = () => {
       });
       navigate("/dashboard");
     }
-  }, [loading, user, userRole, navigate, toast]);
+  }, [loading, user, isSales, isAdmin, navigate, toast]);
 
   if (loading) {
     return (
