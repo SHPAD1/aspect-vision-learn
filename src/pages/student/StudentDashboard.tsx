@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link, Outlet, useLocation } from "react-router-dom";
 import {
-  GraduationCap,
   LogOut,
   User,
   BookOpen,
@@ -17,6 +16,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { HelpSupportDialog } from "@/components/shared/HelpSupportDialog";
+import logo from "@/assets/logo.png";
 
 const sidebarLinks = [
   { icon: Home, label: "Dashboard", href: "/dashboard" },
