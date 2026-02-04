@@ -24,13 +24,14 @@ const signupSchema = z.object({
   path: ["confirmPassword"],
 });
 
-type RoleType = "student" | "employee" | "branch" | "admin";
+type RoleType = "student" | "sales" | "support" | "teacher" | "branch_admin";
 
-const roleConfig: Record<RoleType, { label: string; description: string }> = {
-  student: { label: "Student", description: "Access your courses and learning materials" },
-  employee: { label: "Employee", description: "Sales, Support, or Teaching staff" },
-  branch: { label: "Branch", description: "Manage your branch operations" },
-  admin: { label: "Admin", description: "Full system administration" },
+const roleConfig: Record<RoleType, { label: string; description: string; dbRole: string }> = {
+  student: { label: "Student", description: "Access your courses and learning materials", dbRole: "student" },
+  sales: { label: "Sales", description: "Manage leads and enrollments", dbRole: "sales" },
+  support: { label: "Support", description: "Handle student queries and tickets", dbRole: "support" },
+  teacher: { label: "Teacher", description: "Teach courses and manage materials", dbRole: "teacher" },
+  branch_admin: { label: "Branch Admin", description: "Manage your branch operations", dbRole: "branch_admin" },
 };
 
 const Auth = () => {
@@ -157,15 +158,43 @@ const Auth = () => {
           emailRedirectTo: redirectUrl,
           data: {
             full_name: signupData.name.trim(),
+            selected_role: selectedRole,
           },
         },
       });
 
       if (error) throw error;
 
+      // Create profile for the new user
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .insert({
+            user_id: data.user.id,
+            email: signupData.email.trim().toLowerCase(),
+            full_name: signupData.name.trim(),
+          });
+
+        if (profileError) {
+          console.error("Profile creation error:", profileError);
+        }
+
+        // Assign the selected role to the user
+        const { error: roleError } = await supabase
+          .from("user_roles")
+          .insert({
+            user_id: data.user.id,
+            role: roleConfig[selectedRole].dbRole as any,
+          });
+
+        if (roleError) {
+          console.error("Role assignment error:", roleError);
+        }
+      }
+
       toast({
         title: "Account Created!",
-        description: "Please check your email to verify your account.",
+        description: `Your ${roleConfig[selectedRole].label} account has been created. Please check your email to verify.`,
       });
       
       setActiveTab("login");
@@ -233,9 +262,11 @@ const Auth = () => {
             </span>
           </Link>
 
-          {/* Role Selector */}
+          {/* Role Selector - Show on both Login and Signup */}
           <div className="mb-8">
-            <p className="text-sm text-muted-foreground mb-3">Login as:</p>
+            <p className="text-sm text-muted-foreground mb-3">
+              {activeTab === "signup" ? "Register as:" : "Login as:"}
+            </p>
             <div className="grid grid-cols-2 gap-2">
               {(Object.keys(roleConfig) as RoleType[]).map((role) => (
                 <button
