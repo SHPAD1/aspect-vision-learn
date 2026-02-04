@@ -171,7 +171,7 @@ const SalesDashboard = () => {
     );
   }
 
-  if (userRole !== "sales" && userRole !== "admin") {
+  if (!isSales && !isAdmin) {
     return null;
   }
 
