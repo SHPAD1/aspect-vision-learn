@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, Link, Outlet, useLocation } from "react-router-dom";
 import {
-  GraduationCap,
   LogOut,
   Users,
   CreditCard,
@@ -15,8 +14,7 @@ import {
   TrendingUp,
   Calendar,
   BookOpen,
-  ChevronLeft,
-  ChevronRight,
+  FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -37,6 +35,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
+import logo from "@/assets/logo.png";
 
 const mainNavItems = [
   { icon: Home, label: "Overview", href: "/admin" },
@@ -44,6 +43,7 @@ const mainNavItems = [
   { icon: CreditCard, label: "Payments", href: "/admin/payments" },
   { icon: BookOpen, label: "Batches", href: "/admin/batches" },
   { icon: BookOpen, label: "Courses", href: "/admin/courses" },
+  { icon: FileText, label: "Requests", href: "/admin/requests" },
 ];
 
 const managementItems = [
@@ -99,9 +99,7 @@ function AdminSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-3 px-2 py-2">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground shrink-0">
-            <GraduationCap className="w-5 h-5" />
-          </div>
+          <img src={logo} alt="Aspect Vision" className="h-8 w-auto shrink-0" />
           {!isCollapsed && (
             <div className="flex flex-col">
               <span className="font-heading text-sm font-bold leading-none">

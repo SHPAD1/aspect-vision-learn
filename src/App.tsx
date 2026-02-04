@@ -33,8 +33,7 @@ import AdminSalary from "./pages/admin/AdminSalary";
 import AdminYoutube from "./pages/admin/AdminYoutube";
 import AdminBatches from "./pages/admin/AdminBatches";
 import AdminCourses from "./pages/admin/AdminCourses";
-
-// Sales pages
+import AdminRequests from "./pages/admin/AdminRequests";
 import SalesDashboard from "./pages/sales/SalesDashboard";
 import SalesOverview from "./pages/sales/SalesOverview";
 import SalesProfile from "./pages/sales/SalesProfile";
@@ -77,6 +76,7 @@ const App = () => (
               <Route path="payments" element={<AdminPayments />} />
               <Route path="batches" element={<AdminBatches />} />
               <Route path="courses" element={<AdminCourses />} />
+              <Route path="requests" element={<AdminRequests />} />
               <Route path="performance" element={<AdminPerformance />} />
               <Route path="salary" element={<AdminSalary />} />
               <Route path="reports" element={<AdminReports />} />

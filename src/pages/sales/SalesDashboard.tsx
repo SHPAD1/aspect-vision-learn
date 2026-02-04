@@ -1,12 +1,10 @@
 import { useEffect } from "react";
 import { useNavigate, Link, Outlet, useLocation } from "react-router-dom";
 import {
-  GraduationCap,
   LogOut,
   Users,
   Home,
   Bell,
-  Phone,
   ClipboardList,
   Target,
   FileText,
@@ -32,6 +30,9 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
+import { HelpSupportDialog } from "@/components/shared/HelpSupportDialog";
+import { RequestDialog } from "@/components/shared/RequestDialog";
+import logo from "@/assets/logo.png";
 
 const navItems = [
   { icon: Home, label: "Overview", href: "/sales" },
@@ -83,9 +84,7 @@ function SalesSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-3 px-2 py-2">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-success text-success-foreground shrink-0">
-            <GraduationCap className="w-5 h-5" />
-          </div>
+          <img src={logo} alt="Aspect Vision" className="h-8 w-auto shrink-0" />
           {!isCollapsed && (
             <div className="flex flex-col">
               <span className="font-heading text-sm font-bold leading-none">
@@ -195,10 +194,14 @@ const SalesDashboard = () => {
                   </p>
                 </div>
               </div>
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="w-5 h-5" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-success rounded-full" />
-              </Button>
+              <div className="flex items-center gap-2">
+                <HelpSupportDialog variant="sales" />
+                <RequestDialog />
+                <Button variant="ghost" size="icon" className="relative">
+                  <Bell className="w-5 h-5" />
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-success rounded-full" />
+                </Button>
+              </div>
             </div>
           </header>
 

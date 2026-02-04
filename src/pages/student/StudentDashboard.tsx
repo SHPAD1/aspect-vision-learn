@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link, Outlet, useLocation } from "react-router-dom";
 import {
-  GraduationCap,
   LogOut,
   User,
   BookOpen,
@@ -17,6 +16,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { HelpSupportDialog } from "@/components/shared/HelpSupportDialog";
+import logo from "@/assets/logo.png";
 
 const sidebarLinks = [
   { icon: Home, label: "Dashboard", href: "/dashboard" },
@@ -88,9 +89,7 @@ const StudentDashboard = () => {
           {/* Logo */}
           <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
             <Link to="/" className="flex items-center gap-2">
-              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-foreground">
-                <GraduationCap className="w-6 h-6" />
-              </div>
+              <img src={logo} alt="Aspect Vision" className="h-10 w-auto" />
               <span className="font-heading text-lg font-bold">
                 Aspect<span className="text-primary">Vision</span>
               </span>
@@ -175,10 +174,13 @@ const StudentDashboard = () => {
                 </p>
               </div>
             </div>
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-accent rounded-full" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <HelpSupportDialog variant="student" />
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-accent rounded-full" />
+              </Button>
+            </div>
           </div>
         </header>
 

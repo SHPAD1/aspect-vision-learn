@@ -49,12 +49,7 @@ export function Navbar() {
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-3">
             <Link to="/auth">
-              <Button variant="ghost" size="sm">
-                Login
-              </Button>
-            </Link>
-            <Link to="/#batches">
-              <Button size="sm">Enroll Now</Button>
+              <Button size="sm">Login</Button>
             </Link>
           </div>
 
@@ -92,12 +87,7 @@ export function Navbar() {
               ))}
               <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-border/50">
                 <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="outline" className="w-full">
-                    Login
-                  </Button>
-                </Link>
-                <Link to="/#batches" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button className="w-full">Enroll Now</Button>
+                  <Button className="w-full">Login</Button>
                 </Link>
               </div>
             </div>
