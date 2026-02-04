@@ -17,6 +17,7 @@ import StudentCourses from "./pages/student/StudentCourses";
 import StudentPayments from "./pages/student/StudentPayments";
 import StudentReports from "./pages/student/StudentReports";
 import StudentIDCard from "./pages/student/StudentIDCard";
+import CourseBrowser from "./pages/student/CourseBrowser";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -32,6 +33,16 @@ import AdminSalary from "./pages/admin/AdminSalary";
 import AdminYoutube from "./pages/admin/AdminYoutube";
 import AdminBatches from "./pages/admin/AdminBatches";
 import AdminCourses from "./pages/admin/AdminCourses";
+
+// Sales pages
+import SalesDashboard from "./pages/sales/SalesDashboard";
+import SalesOverview from "./pages/sales/SalesOverview";
+import SalesProfile from "./pages/sales/SalesProfile";
+import SalesLeads from "./pages/sales/SalesLeads";
+import SalesEntry from "./pages/sales/SalesEntry";
+import SalesFollowups from "./pages/sales/SalesFollowups";
+import SalesKPI from "./pages/sales/SalesKPI";
+import SalesReport from "./pages/sales/SalesReport";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +63,7 @@ const App = () => (
               <Route index element={<StudentOverview />} />
               <Route path="profile" element={<StudentProfile />} />
               <Route path="courses" element={<StudentCourses />} />
+              <Route path="browse" element={<CourseBrowser />} />
               <Route path="payments" element={<StudentPayments />} />
               <Route path="reports" element={<StudentReports />} />
               <Route path="id-card" element={<StudentIDCard />} />
@@ -71,6 +83,17 @@ const App = () => (
               <Route path="youtube" element={<AdminYoutube />} />
               <Route path="branches" element={<AdminBranches />} />
               <Route path="settings" element={<AdminSettings />} />
+            </Route>
+            
+            {/* Sales Dashboard */}
+            <Route path="/sales" element={<SalesDashboard />}>
+              <Route index element={<SalesOverview />} />
+              <Route path="profile" element={<SalesProfile />} />
+              <Route path="leads" element={<SalesLeads />} />
+              <Route path="entry" element={<SalesEntry />} />
+              <Route path="followups" element={<SalesFollowups />} />
+              <Route path="kpi" element={<SalesKPI />} />
+              <Route path="report" element={<SalesReport />} />
             </Route>
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
