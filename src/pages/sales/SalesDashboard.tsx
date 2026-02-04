@@ -1,12 +1,10 @@
 import { useEffect } from "react";
 import { useNavigate, Link, Outlet, useLocation } from "react-router-dom";
 import {
-  GraduationCap,
   LogOut,
   Users,
   Home,
   Bell,
-  Phone,
   ClipboardList,
   Target,
   FileText,
@@ -32,6 +30,9 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
+import { HelpSupportDialog } from "@/components/shared/HelpSupportDialog";
+import { RequestDialog } from "@/components/shared/RequestDialog";
+import logo from "@/assets/logo.png";
 
 const navItems = [
   { icon: Home, label: "Overview", href: "/sales" },
