@@ -49,12 +49,7 @@ export function Navbar() {
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-3">
             <Link to="/auth">
-              <Button variant="ghost" size="sm">
-                Login
-              </Button>
-            </Link>
-            <Link to="/#batches">
-              <Button size="sm">Enroll Now</Button>
+              <Button size="sm">Login</Button>
             </Link>
           </div>
 
