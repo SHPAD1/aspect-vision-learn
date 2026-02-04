@@ -158,6 +158,65 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_requests: {
+        Row: {
+          admin_approved_at: string | null
+          admin_approved_by: string | null
+          branch_approved_at: string | null
+          branch_approved_by: string | null
+          branch_id: string | null
+          created_at: string
+          description: string
+          id: string
+          rejection_reason: string | null
+          request_type: string
+          status: string
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_approved_at?: string | null
+          admin_approved_by?: string | null
+          branch_approved_at?: string | null
+          branch_approved_by?: string | null
+          branch_id?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          rejection_reason?: string | null
+          request_type: string
+          status?: string
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_approved_at?: string | null
+          admin_approved_by?: string | null
+          branch_approved_at?: string | null
+          branch_approved_by?: string | null
+          branch_id?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          rejection_reason?: string | null
+          request_type?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_requests_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employees: {
         Row: {
           branch_id: string | null
