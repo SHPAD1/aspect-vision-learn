@@ -28,12 +28,14 @@
  
      try {
        // Create a support ticket (for non-logged in users, we'll use a placeholder user_id)
-       const { error } = await supabase.from("support_tickets").insert({
-         user_id: "00000000-0000-0000-0000-000000000000", // Placeholder for anonymous
-         subject: `[${formData.category}] ${formData.subject} - ${formData.name} (${formData.email})`,
-         description: `Name: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\n\n${formData.message}`,
-         priority: "medium",
-         status: "open",
+       // For non-logged in users, we create an enrollment lead with contact inquiry source
+       const { error } = await supabase.from("enrollment_leads").insert({
+         student_name: formData.name,
+         email: formData.email,
+         phone: formData.phone || "Not provided",
+         notes: `Category: ${formData.category}\nSubject: ${formData.subject}\n\n${formData.message}`,
+         source: "contact_form",
+         status: "new",
        });
  
        if (error) throw error;
