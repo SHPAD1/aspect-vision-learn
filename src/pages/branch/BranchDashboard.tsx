@@ -189,7 +189,6 @@
    const navigate = useNavigate();
    const { toast } = useToast();
    const [branchInfo, setBranchInfo] = useState<BranchInfo | null>(null);
-   const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false);
  
    useEffect(() => {
      if (!loading && !user) {
@@ -269,14 +268,7 @@
                  </div>
                </div>
                <div className="flex items-center gap-2">
-                 <Button
-                   variant="outline"
-                   size="sm"
-                   onClick={() => setIsRequestDialogOpen(true)}
-                 >
-                   <FileText className="w-4 h-4 mr-2" />
-                   Request
-                 </Button>
+                <RequestDialog />
                  <Button variant="ghost" size="icon" className="relative">
                    <Bell className="w-5 h-5" />
                    <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full" />
@@ -291,11 +283,6 @@
            </div>
          </main>
        </div>
- 
-       <RequestDialog
-         open={isRequestDialogOpen}
-         onOpenChange={setIsRequestDialogOpen}
-       />
      </SidebarProvider>
    );
  };
