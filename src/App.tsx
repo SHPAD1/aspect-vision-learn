@@ -52,6 +52,17 @@ import SupportTickets from "./pages/support/SupportTickets";
 import SupportResolved from "./pages/support/SupportResolved";
 import SupportPerformance from "./pages/support/SupportPerformance";
 
+// Branch Admin pages
+import BranchDashboard from "./pages/branch/BranchDashboard";
+import BranchOverview from "./pages/branch/BranchOverview";
+import BranchProfile from "./pages/branch/BranchProfile";
+import BranchBatches from "./pages/branch/BranchBatches";
+import BranchStudents from "./pages/branch/BranchStudents";
+import BranchEmployees from "./pages/branch/BranchEmployees";
+import BranchPayments from "./pages/branch/BranchPayments";
+import BranchReports from "./pages/branch/BranchReports";
+import BranchAnalytics from "./pages/branch/BranchAnalytics";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -112,6 +123,18 @@ const App = () => (
               <Route path="tickets" element={<SupportTickets />} />
               <Route path="resolved" element={<SupportResolved />} />
               <Route path="performance" element={<SupportPerformance />} />
+            </Route>
+            
+            {/* Branch Admin Dashboard */}
+            <Route path="/branch" element={<BranchDashboard />}>
+              <Route index element={<BranchOverview />} />
+              <Route path="profile" element={<BranchProfile />} />
+              <Route path="batches" element={<BranchBatches />} />
+              <Route path="students" element={<BranchStudents />} />
+              <Route path="employees" element={<BranchEmployees />} />
+              <Route path="payments" element={<BranchPayments />} />
+              <Route path="reports" element={<BranchReports />} />
+              <Route path="analytics" element={<BranchAnalytics />} />
             </Route>
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
