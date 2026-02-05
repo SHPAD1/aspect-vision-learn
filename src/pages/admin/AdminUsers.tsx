@@ -12,6 +12,8 @@ import {
   Loader2,
   UserPlus,
   UserX,
+  Building,
+  Briefcase,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,7 +67,27 @@ interface UserWithRoles {
   roles: AppRole[];
   created_at: string;
   is_blocked?: boolean;
+  branch_id?: string | null;
+  department?: string | null;
 }
+
+interface Branch {
+  id: string;
+  name: string;
+  code: string;
+  city: string;
+}
+
+const departments = [
+  { value: "sales", label: "Sales" },
+  { value: "support", label: "Support" },
+  { value: "teaching", label: "Teaching" },
+  { value: "management", label: "Management" },
+  { value: "operations", label: "Operations" },
+];
+
+// Roles that require branch/employee mapping
+const employeeRoles: AppRole[] = ["branch_admin", "teacher", "sales", "support"];
 
 const roleColors: Record<AppRole, string> = {
   admin: "bg-destructive/10 text-destructive",
@@ -94,12 +116,33 @@ const AdminUsers = () => {
     phone: "",
     city: "",
     role: "student" as AppRole,
+    branch_id: "",
+    department: "",
+    designation: "",
+    salary: "",
   });
+  const [branches, setBranches] = useState<Branch[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchUsers();
+    fetchBranches();
   }, []);
+
+  const fetchBranches = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("branches")
+        .select("id, name, code, city")
+        .eq("is_active", true)
+        .order("name");
+
+      if (error) throw error;
+      setBranches(data || []);
+    } catch (error) {
+      console.error("Error fetching branches:", error);
+    }
+  };
 
   const fetchUsers = async () => {
     try {
@@ -154,6 +197,10 @@ const AdminUsers = () => {
       phone: "",
       city: "",
       role: "student",
+      branch_id: "",
+      department: "",
+      designation: "",
+      salary: "",
     });
   };
 
@@ -171,6 +218,16 @@ const AdminUsers = () => {
       toast({
         title: "Validation Error",
         description: "Password must be at least 6 characters",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate branch for employee roles
+    if (employeeRoles.includes(formData.role) && !formData.branch_id) {
+      toast({
+        title: "Validation Error",
+        description: "Branch selection is required for this role",
         variant: "destructive",
       });
       return;
@@ -211,6 +268,33 @@ const AdminUsers = () => {
 
         if (roleError) throw roleError;
 
+        // Create employee record for employee roles
+        if (employeeRoles.includes(formData.role) && formData.branch_id) {
+          const employeeId = `EMP-${Date.now().toString(36).toUpperCase()}`;
+          const { error: employeeError } = await supabase.from("employees").insert({
+            user_id: authData.user.id,
+            employee_id: employeeId,
+            branch_id: formData.branch_id,
+            department: formData.department || formData.role,
+            designation: formData.designation.trim() || null,
+            salary: formData.salary ? parseFloat(formData.salary) : null,
+          });
+
+          if (employeeError) throw employeeError;
+        }
+
+        // Create student record for student role
+        if (formData.role === "student") {
+          const studentId = `STU-${Date.now().toString(36).toUpperCase()}`;
+          const { error: studentError } = await supabase.from("students").insert({
+            user_id: authData.user.id,
+            student_id: studentId,
+            branch_id: formData.branch_id || null,
+          });
+
+          if (studentError) throw studentError;
+        }
+
         toast({
           title: "Success",
           description: "User created successfully. They will receive a confirmation email.",
@@ -240,6 +324,10 @@ const AdminUsers = () => {
       phone: user.phone || "",
       city: user.city || "",
       role: user.roles[0] || "student",
+      branch_id: user.branch_id || "",
+      department: user.department || "",
+      designation: "",
+      salary: "",
     });
     setIsEditDialogOpen(true);
   };
@@ -601,7 +689,7 @@ const AdminUsers = () => {
 
       {/* Add User Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add New User</DialogTitle>
           </DialogHeader>
@@ -668,7 +756,7 @@ const AdminUsers = () => {
               <Select
                 value={formData.role}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, role: value as AppRole })
+                  setFormData({ ...formData, role: value as AppRole, branch_id: "", department: "" })
                 }
               >
                 <SelectTrigger>
@@ -684,6 +772,87 @@ const AdminUsers = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Branch Selection - for employee roles and students */}
+            {(employeeRoles.includes(formData.role) || formData.role === "student") && (
+              <div>
+                <Label htmlFor="add-branch">
+                  <Building className="w-3 h-3 inline mr-1" />
+                  Branch {employeeRoles.includes(formData.role) ? "*" : "(Optional)"}
+                </Label>
+                <Select
+                  value={formData.branch_id}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, branch_id: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select branch" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {branches.map((branch) => (
+                      <SelectItem key={branch.id} value={branch.id}>
+                        {branch.name} ({branch.code})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Department & Designation - only for employee roles */}
+            {employeeRoles.includes(formData.role) && (
+              <>
+                <div>
+                  <Label htmlFor="add-department">
+                    <Briefcase className="w-3 h-3 inline mr-1" />
+                    Department
+                  </Label>
+                  <Select
+                    value={formData.department}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, department: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select department" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {departments.map((dept) => (
+                        <SelectItem key={dept.value} value={dept.value}>
+                          {dept.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="add-designation">Designation</Label>
+                    <Input
+                      id="add-designation"
+                      value={formData.designation}
+                      onChange={(e) =>
+                        setFormData({ ...formData, designation: e.target.value })
+                      }
+                      placeholder="e.g. Manager"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="add-salary">Salary</Label>
+                    <Input
+                      id="add-salary"
+                      type="number"
+                      value={formData.salary}
+                      onChange={(e) =>
+                        setFormData({ ...formData, salary: e.target.value })
+                      }
+                      placeholder="Monthly salary"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>

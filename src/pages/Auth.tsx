@@ -8,13 +8,38 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import logo from "@/assets/logo.png";
+import type { Database } from "@/integrations/supabase/types";
+
+type AppRole = Database["public"]["Enums"]["app_role"];
+
+// Role priority for redirect - highest priority role wins
+const rolePriority: AppRole[] = ["admin", "branch_admin", "teacher", "sales", "support", "student"];
+
+// Route mapping for each role
+const roleRoutes: Record<AppRole, string> = {
+  admin: "/admin",
+  branch_admin: "/admin",
+  teacher: "/dashboard", // TODO: Create teacher dashboard
+  sales: "/sales",
+  support: "/support",
+  student: "/dashboard",
+};
+
+const getRedirectRoute = (userRoles: AppRole[]): string => {
+  for (const role of rolePriority) {
+    if (userRoles.includes(role)) {
+      return roleRoutes[role];
+    }
+  }
+  return "/dashboard"; // Default fallback
+};
 
 const loginSchema = z.object({
   email: z.string().trim().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-type RoleType = "student" | "sales" | "support" | "teacher" | "branch_admin";
+type RoleType = "student" | "sales" | "support" | "teacher" | "branch_admin" | "admin";
 
 const roleConfig: Record<RoleType, { label: string; description: string }> = {
   student: { label: "Student", description: "Access your courses and learning materials" },
@@ -22,6 +47,7 @@ const roleConfig: Record<RoleType, { label: string; description: string }> = {
   support: { label: "Support", description: "Handle student queries and tickets" },
   teacher: { label: "Teacher", description: "Teach courses and manage materials" },
   branch_admin: { label: "Branch Admin", description: "Manage your branch operations" },
+  admin: { label: "Admin", description: "Full system administration" },
 };
 
 const Auth = () => {
@@ -46,17 +72,10 @@ const Auth = () => {
           .select("role")
           .eq("user_id", session.user.id);
         
-        const userRoles = roles?.map(r => r.role) || [];
+        const userRoles = (roles?.map(r => r.role) || []) as AppRole[];
         
-        if (userRoles.includes("admin")) {
-          navigate("/admin");
-        } else if (userRoles.includes("branch_admin")) {
-          navigate("/admin");
-        } else if (userRoles.includes("sales")) {
-          navigate("/sales");
-        } else {
-          navigate("/dashboard");
-        }
+        const redirectRoute = getRedirectRoute(userRoles);
+        navigate(redirectRoute);
       }
     };
     checkSession();
@@ -92,23 +111,29 @@ const Auth = () => {
         .select("role")
         .eq("user_id", data.user.id);
 
-      const userRoles = roles?.map(r => r.role) || [];
+      const userRoles = (roles?.map(r => r.role) || []) as AppRole[];
+      
+      // Validate that user has the selected role (or any role if selected doesn't match)
+      const hasSelectedRole = userRoles.includes(selectedRole as AppRole);
 
       toast({ title: "Welcome back!", description: "Login successful." });
       
-      // Redirect based on role
-      if (userRoles.includes("admin")) {
-        navigate("/admin");
-      } else if (userRoles.includes("branch_admin")) {
-        navigate("/admin");
-      } else if (userRoles.includes("sales")) {
-        navigate("/sales");
-      } else if (userRoles.includes("teacher")) {
-        navigate("/dashboard"); // Can extend to teacher dashboard later
-      } else if (userRoles.includes("support")) {
-        navigate("/support");
+      // If user has the selected role, go to that dashboard
+      // Otherwise, redirect based on their highest priority role
+      if (hasSelectedRole) {
+        navigate(roleRoutes[selectedRole as AppRole]);
       } else {
-        navigate("/dashboard");
+        const redirectRoute = getRedirectRoute(userRoles);
+        navigate(redirectRoute);
+        
+        // Optionally notify if role doesn't match
+        if (userRoles.length > 0) {
+          toast({
+            title: "Role Mismatch",
+            description: `You don't have ${selectedRole} access. Redirecting to your dashboard.`,
+            variant: "default",
+          });
+        }
       }
     } catch (error: any) {
       toast({
