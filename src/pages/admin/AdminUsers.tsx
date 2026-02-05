@@ -324,6 +324,10 @@ const AdminUsers = () => {
       phone: user.phone || "",
       city: user.city || "",
       role: user.roles[0] || "student",
+      branch_id: user.branch_id || "",
+      department: user.department || "",
+      designation: "",
+      salary: "",
     });
     setIsEditDialogOpen(true);
   };
