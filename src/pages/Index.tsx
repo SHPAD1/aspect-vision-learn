@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { HeroSection } from "@/components/home/HeroSection";
+ import { BannerSlider } from "@/components/home/BannerSlider";
+ import { StatsSection } from "@/components/home/StatsSection";
 import { BatchesSection } from "@/components/home/BatchesSection";
 import { FeaturesSection } from "@/components/home/FeaturesSection";
 import { CTASection } from "@/components/home/CTASection";
@@ -12,7 +13,8 @@ const Index = () => {
       <Navbar />
       <WelcomePopup />
       <main>
-        <HeroSection />
+         <BannerSlider />
+         <StatsSection />
         <BatchesSection />
         <FeaturesSection />
         <CTASection />

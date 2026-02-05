@@ -19,6 +19,13 @@ import StudentReports from "./pages/student/StudentReports";
 import StudentIDCard from "./pages/student/StudentIDCard";
 import CourseBrowser from "./pages/student/CourseBrowser";
 
+ // Public pages
+ import About from "./pages/About";
+ import Contact from "./pages/Contact";
+ import AllBatches from "./pages/AllBatches";
+ import CareerCounseling from "./pages/CareerCounseling";
+ import AdmissionAssistance from "./pages/AdmissionAssistance";
+ 
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminOverview from "./pages/admin/AdminOverview";
@@ -34,6 +41,7 @@ import AdminYoutube from "./pages/admin/AdminYoutube";
 import AdminBatches from "./pages/admin/AdminBatches";
 import AdminCourses from "./pages/admin/AdminCourses";
 import AdminRequests from "./pages/admin/AdminRequests";
+ import AdminBanners from "./pages/admin/AdminBanners";
 // Sales pages
 import SalesDashboard from "./pages/sales/SalesDashboard";
 import SalesOverview from "./pages/sales/SalesOverview";
@@ -76,6 +84,11 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/ai-tutor" element={<AITutor />} />
+           <Route path="/about" element={<About />} />
+           <Route path="/contact" element={<Contact />} />
+           <Route path="/batches" element={<AllBatches />} />
+           <Route path="/career-counseling" element={<CareerCounseling />} />
+           <Route path="/admission-assistance" element={<AdmissionAssistance />} />
             
             {/* Student Dashboard */}
             <Route path="/dashboard" element={<StudentDashboard />}>
@@ -97,6 +110,7 @@ const App = () => (
               <Route path="batches" element={<AdminBatches />} />
               <Route path="courses" element={<AdminCourses />} />
               <Route path="requests" element={<AdminRequests />} />
+             <Route path="banners" element={<AdminBanners />} />
               <Route path="performance" element={<AdminPerformance />} />
               <Route path="salary" element={<AdminSalary />} />
               <Route path="reports" element={<AdminReports />} />

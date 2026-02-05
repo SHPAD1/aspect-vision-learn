@@ -44,6 +44,7 @@ interface Lead {
   notes: string | null;
   created_at: string;
   batch_id: string | null;
+   source: string | null;
 }
 
 const SalesLeads = () => {
@@ -226,6 +227,17 @@ const SalesLeads = () => {
                     <Badge className={getStatusColor(lead.status)}>
                       {lead.status.replace("_", " ")}
                     </Badge>
+                     {lead.source && lead.source !== "website" && (
+                       <Badge variant="outline" className="text-xs">
+                         {lead.source === "career_counseling"
+                           ? "Career Counseling"
+                           : lead.source === "admission_assistance"
+                           ? "Admission Help"
+                           : lead.source === "contact_form"
+                           ? "Contact Form"
+                           : lead.source}
+                       </Badge>
+                     )}
                   </div>
                   <div className="flex flex-wrap gap-4 mt-2 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">

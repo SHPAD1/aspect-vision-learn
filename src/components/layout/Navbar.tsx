@@ -1,13 +1,21 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+ import { useState, useEffect } from "react";
+ import { Link, useLocation, useNavigate } from "react-router-dom";
+ import { Menu, X, Download, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+ import {
+   DropdownMenu,
+   DropdownMenuContent,
+   DropdownMenuItem,
+   DropdownMenuTrigger,
+ } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import logo from "@/assets/logo.png";
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/batches", label: "All Batches" },
+   { href: "/batches", label: "All Batches" },
+   { href: "/career-counseling", label: "Career Counseling" },
+   { href: "/admission-assistance", label: "Admission Assistance" },
   { href: "/about", label: "About Us" },
   { href: "/contact", label: "Contact" },
 ];
@@ -15,6 +23,17 @@ const navLinks = [
 export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+   const navigate = useNavigate();
+ 
+   // Close mobile menu on route change
+   useEffect(() => {
+     setIsMobileMenuOpen(false);
+   }, [location.pathname]);
+ 
+   const handleDownloadApp = () => {
+     // Placeholder for app download
+     window.open("https://play.google.com/store", "_blank");
+   };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/50">
@@ -35,7 +54,7 @@ export function Navbar() {
                 key={link.href}
                 to={link.href}
                 className={cn(
-                  "px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200",
+                   "px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200",
                   location.pathname === link.href
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -48,8 +67,12 @@ export function Navbar() {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-3">
+             <Button variant="outline" size="sm" onClick={handleDownloadApp}>
+               <Download className="w-4 h-4 mr-1" />
+               Download App
+             </Button>
             <Link to="/auth">
-              <Button size="sm">Login</Button>
+               <Button size="sm">Login / Signup</Button>
             </Link>
           </div>
 
@@ -80,13 +103,16 @@ export function Navbar() {
                       ? "bg-primary/10 text-primary"
                       : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   )}
-                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.label}
                 </Link>
               ))}
               <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-border/50">
-                <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
+                 <Button variant="outline" onClick={handleDownloadApp} className="w-full">
+                   <Download className="w-4 h-4 mr-2" />
+                   Download App
+                 </Button>
+                 <Link to="/auth">
                   <Button className="w-full">Login</Button>
                 </Link>
               </div>
