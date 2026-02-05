@@ -9,6 +9,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  rolesLoading: boolean;
   roles: AppRole[];
   hasRole: (role: AppRole) => boolean;
   isAdmin: boolean;
@@ -18,14 +19,19 @@ interface AuthContextType {
   isSupport: boolean;
   isStudent: boolean;
   signOut: () => Promise<void>;
+  getPrimaryRole: () => AppRole | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Role priority for determining primary dashboard
+const rolePriority: AppRole[] = ["admin", "branch_admin", "teacher", "sales", "support", "student"];
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [rolesLoading, setRolesLoading] = useState(true);
   const [roles, setRoles] = useState<AppRole[]>([]);
 
   useEffect(() => {
@@ -35,12 +41,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null);
         
         if (session?.user) {
+          setRolesLoading(true);
           setTimeout(() => {
             fetchUserRoles(session.user.id);
           }, 0);
         } else {
           setRoles([]);
           setLoading(false);
+          setRolesLoading(false);
         }
       }
     );
@@ -50,9 +58,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
       
       if (session?.user) {
+        setRolesLoading(true);
         fetchUserRoles(session.user.id);
       } else {
         setLoading(false);
+        setRolesLoading(false);
       }
     });
 
@@ -74,10 +84,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setRoles([]);
     } finally {
       setLoading(false);
+      setRolesLoading(false);
     }
   };
 
   const hasRole = (role: AppRole) => roles.includes(role);
+
+  const getPrimaryRole = (): AppRole | null => {
+    for (const role of rolePriority) {
+      if (roles.includes(role)) {
+        return role;
+      }
+    }
+    return null;
+  };
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -88,6 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     session,
     loading,
+    rolesLoading,
     roles,
     hasRole,
     isAdmin: hasRole("admin"),
@@ -97,6 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isSupport: hasRole("support"),
     isStudent: hasRole("student"),
     signOut,
+    getPrimaryRole,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
