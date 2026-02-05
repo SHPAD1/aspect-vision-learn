@@ -15,6 +15,7 @@ import {
   Calendar,
   BookOpen,
   FileText,
+   Image,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -44,6 +45,7 @@ const mainNavItems = [
   { icon: BookOpen, label: "Batches", href: "/admin/batches" },
   { icon: BookOpen, label: "Courses", href: "/admin/courses" },
   { icon: FileText, label: "Requests", href: "/admin/requests" },
+   { icon: Image, label: "Banners", href: "/admin/banners" },
 ];
 
 const managementItems = [
