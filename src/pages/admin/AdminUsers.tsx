@@ -54,6 +54,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { Database } from "@/integrations/supabase/types";
+import { useAuth } from "@/hooks/useAuth";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
 
@@ -123,6 +124,7 @@ const AdminUsers = () => {
   });
   const [branches, setBranches] = useState<Branch[]>([]);
   const { toast } = useToast();
+  const { session } = useAuth();
 
   useEffect(() => {
     fetchUsers();
@@ -235,74 +237,37 @@ const AdminUsers = () => {
 
     setFormLoading(true);
     try {
-      // Create auth user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email.trim(),
-        password: formData.password,
-        options: {
-          data: {
-            full_name: formData.full_name.trim(),
-          },
+      // Call edge function to create user (preserves admin session)
+      const { data, error } = await supabase.functions.invoke("create-user", {
+        body: {
+          email: formData.email.trim(),
+          password: formData.password,
+          full_name: formData.full_name.trim(),
+          phone: formData.phone.trim() || null,
+          city: formData.city.trim() || null,
+          role: formData.role,
+          branch_id: formData.branch_id || null,
+          department: formData.department || formData.role,
+          designation: formData.designation.trim() || null,
+          salary: formData.salary ? parseFloat(formData.salary) : null,
         },
       });
 
-      if (authError) throw authError;
-
-      if (authData.user) {
-        // Create profile
-        const { error: profileError } = await supabase.from("profiles").insert({
-          user_id: authData.user.id,
-          full_name: formData.full_name.trim(),
-          email: formData.email.trim(),
-          phone: formData.phone.trim() || null,
-          city: formData.city.trim() || null,
-        });
-
-        if (profileError) throw profileError;
-
-        // Assign role
-        const { error: roleError } = await supabase.from("user_roles").insert({
-          user_id: authData.user.id,
-          role: formData.role,
-        });
-
-        if (roleError) throw roleError;
-
-        // Create employee record for employee roles
-        if (employeeRoles.includes(formData.role) && formData.branch_id) {
-          const employeeId = `EMP-${Date.now().toString(36).toUpperCase()}`;
-          const { error: employeeError } = await supabase.from("employees").insert({
-            user_id: authData.user.id,
-            employee_id: employeeId,
-            branch_id: formData.branch_id,
-            department: formData.department || formData.role,
-            designation: formData.designation.trim() || null,
-            salary: formData.salary ? parseFloat(formData.salary) : null,
-          });
-
-          if (employeeError) throw employeeError;
-        }
-
-        // Create student record for student role
-        if (formData.role === "student") {
-          const studentId = `STU-${Date.now().toString(36).toUpperCase()}`;
-          const { error: studentError } = await supabase.from("students").insert({
-            user_id: authData.user.id,
-            student_id: studentId,
-            branch_id: formData.branch_id || null,
-          });
-
-          if (studentError) throw studentError;
-        }
-
-        toast({
-          title: "Success",
-          description: "User created successfully. They will receive a confirmation email.",
-        });
-        setIsAddDialogOpen(false);
-        resetForm();
-        fetchUsers();
+      if (error) {
+        throw new Error(error.message || "Failed to create user");
       }
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
+      toast({
+        title: "Success",
+        description: "User created successfully. They can now login with their credentials.",
+      });
+      setIsAddDialogOpen(false);
+      resetForm();
+      fetchUsers();
     } catch (error: any) {
       console.error("Error creating user:", error);
       toast({
