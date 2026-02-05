@@ -756,7 +756,7 @@ const AdminUsers = () => {
               <Select
                 value={formData.role}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, role: value as AppRole })
+                  setFormData({ ...formData, role: value as AppRole, branch_id: "", department: "" })
                 }
               >
                 <SelectTrigger>
@@ -772,6 +772,87 @@ const AdminUsers = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Branch Selection - for employee roles and students */}
+            {(employeeRoles.includes(formData.role) || formData.role === "student") && (
+              <div>
+                <Label htmlFor="add-branch">
+                  <Building className="w-3 h-3 inline mr-1" />
+                  Branch {employeeRoles.includes(formData.role) ? "*" : "(Optional)"}
+                </Label>
+                <Select
+                  value={formData.branch_id}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, branch_id: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select branch" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {branches.map((branch) => (
+                      <SelectItem key={branch.id} value={branch.id}>
+                        {branch.name} ({branch.code})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Department & Designation - only for employee roles */}
+            {employeeRoles.includes(formData.role) && (
+              <>
+                <div>
+                  <Label htmlFor="add-department">
+                    <Briefcase className="w-3 h-3 inline mr-1" />
+                    Department
+                  </Label>
+                  <Select
+                    value={formData.department}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, department: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select department" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {departments.map((dept) => (
+                        <SelectItem key={dept.value} value={dept.value}>
+                          {dept.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="add-designation">Designation</Label>
+                    <Input
+                      id="add-designation"
+                      value={formData.designation}
+                      onChange={(e) =>
+                        setFormData({ ...formData, designation: e.target.value })
+                      }
+                      placeholder="e.g. Manager"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="add-salary">Salary</Label>
+                    <Input
+                      id="add-salary"
+                      type="number"
+                      value={formData.salary}
+                      onChange={(e) =>
+                        setFormData({ ...formData, salary: e.target.value })
+                      }
+                      placeholder="Monthly salary"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
