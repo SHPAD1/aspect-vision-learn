@@ -233,6 +233,8 @@ const SalesLeads = () => {
                            ? "Career Counseling"
                            : lead.source === "admission_assistance"
                            ? "Admission Help"
+                           : lead.source === "contact_form"
+                           ? "Contact Form"
                            : lead.source}
                        </Badge>
                      )}
