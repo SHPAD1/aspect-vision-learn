@@ -18,7 +18,7 @@ const rolePriority: AppRole[] = ["admin", "branch_admin", "teacher", "sales", "s
 // Route mapping for each role
 const roleRoutes: Record<AppRole, string> = {
   admin: "/admin",
-  branch_admin: "/admin",
+  branch_admin: "/branch",
   teacher: "/dashboard", // TODO: Create teacher dashboard
   sales: "/sales",
   support: "/support",
