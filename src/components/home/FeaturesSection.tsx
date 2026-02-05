@@ -1,35 +1,35 @@
-import { GraduationCap, Laptop, Users, Award, Clock, HeadphonesIcon } from "lucide-react";
+ import { GraduationCap, FileText, Users, Award, Clock, HeadphonesIcon } from "lucide-react";
 
 const features = [
   {
     icon: GraduationCap,
     title: "Expert Instructors",
-    description: "Learn from industry professionals with 10+ years of experience in their fields.",
+     description: "Learn from faculty with 10+ years of experience in competitive exam coaching.",
   },
   {
-    icon: Laptop,
-    title: "Hands-on Projects",
-    description: "Build real-world projects that you can add to your portfolio and showcase to employers.",
+     icon: FileText,
+     title: "Comprehensive Study Material",
+     description: "Get access to updated study materials, previous year papers, and regular mock tests.",
   },
   {
     icon: Users,
     title: "Small Batch Sizes",
-    description: "Maximum 30 students per batch ensures personalized attention and better learning outcomes.",
+     description: "Maximum 30 students per batch ensures individual attention and doubt clearing.",
   },
   {
     icon: Award,
-    title: "Industry Certification",
-    description: "Get certified upon completion and stand out in your job applications.",
+     title: "Proven Results",
+     description: "98% selection rate with hundreds of successful candidates in SSC, Banking, Railway exams.",
   },
   {
     icon: Clock,
     title: "Flexible Timings",
-    description: "Choose from weekday or weekend batches that fit your schedule.",
+     description: "Choose from morning, evening, or weekend batches that fit your schedule.",
   },
   {
     icon: HeadphonesIcon,
     title: "24/7 Support",
-    description: "Get help anytime with our AI tutor and dedicated support team.",
+     description: "Get help anytime with our dedicated support team and doubt clearing sessions.",
   },
 ];
 
@@ -43,10 +43,10 @@ export function FeaturesSection() {
             Why Choose Us
           </span>
           <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-            Learn Different. Succeed Different.
+             Your Success is Our Priority
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            We've designed our programs to give you the best learning experience and career outcomes.
+             We've designed our programs to ensure maximum success in competitive examinations.
           </p>
         </div>
 
