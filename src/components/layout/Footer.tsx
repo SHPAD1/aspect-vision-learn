@@ -24,10 +24,10 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { icon: Instagram, href: "https://instagram.com/aspectvision", label: "Instagram" },
-  { icon: Linkedin, href: "https://linkedin.com/company/aspectvision", label: "LinkedIn" },
-  { icon: Youtube, href: "https://youtube.com/@aspectvision", label: "YouTube" },
-  { icon: Facebook, href: "https://facebook.com/aspectvision", label: "Facebook" },
+  { icon: Instagram, href: "https://www.instagram.com/aspectvisionofficial?igsh=MXJlaGY2dTVxMjMzMQ==", label: "Instagram" },
+  { icon: Linkedin, href: "https://www.linkedin.com/company/aspect-vision/", label: "LinkedIn" },
+  { icon: Youtube, href: "https://www.youtube.com/@AspectVision", label: "YouTube" },
+  { icon: Facebook, href: "https://www.facebook.com/share/1GGPuy97hi/", label: "Facebook" },
 ];
 
 const offices = [
