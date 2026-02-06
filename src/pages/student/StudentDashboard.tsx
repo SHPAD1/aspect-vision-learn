@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { HelpSupportDialog } from "@/components/shared/HelpSupportDialog";
+import { NotificationBell } from "@/components/shared/NotificationBell";
 import logo from "@/assets/logo.png";
 
 const sidebarLinks = [
