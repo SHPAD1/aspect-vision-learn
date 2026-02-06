@@ -32,6 +32,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { HelpSupportDialog } from "@/components/shared/HelpSupportDialog";
 import { RequestDialog } from "@/components/shared/RequestDialog";
+import { NotificationBell } from "@/components/shared/NotificationBell";
 import logo from "@/assets/logo.png";
 
 const navItems = [
