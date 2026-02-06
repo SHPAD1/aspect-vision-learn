@@ -188,6 +188,7 @@ const AdminCourses = () => {
           duration_weeks: parseInt(formData.duration_weeks) || 12,
           thumbnail_url: formData.thumbnail_url.trim() || null,
           is_active: formData.is_active,
+          discount_percent: parseInt(formData.discount_percent) || 0,
         })
         .eq("id", selectedCourse.id);
 
