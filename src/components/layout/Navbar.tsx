@@ -31,8 +31,7 @@ export function Navbar() {
    }, [location.pathname]);
  
    const handleDownloadApp = () => {
-     // Placeholder for app download
-     window.open("https://play.google.com/store", "_blank");
+     window.open("https://play.google.com/store/apps/details?id=com.aspect.vision", "_blank");
    };
 
   return (
