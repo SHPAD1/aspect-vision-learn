@@ -71,6 +71,7 @@ export function BatchesSection() {
         description: batch.description || "",
         schedule: batch.schedule || "TBD",
         thumbnail_url: batch.courses?.thumbnail_url,
+        discount_percent: batch.courses?.discount_percent,
       }));
 
       setBatches(formattedBatches);

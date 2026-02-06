@@ -78,8 +78,8 @@
                  <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4">
                    <Award className="w-8 h-8 text-primary" />
                  </div>
-                 <span className="block font-heading text-3xl font-bold text-foreground">50+</span>
-                 <span className="text-sm text-muted-foreground">Expert Faculty</span>
+                  <span className="block font-heading text-3xl font-bold text-foreground">20+</span>
+                  <span className="text-sm text-muted-foreground">Expert Faculty</span>
                </div>
              </div>
            </div>
