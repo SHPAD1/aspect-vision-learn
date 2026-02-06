@@ -39,6 +39,7 @@ interface Course {
   duration_weeks: number;
   thumbnail_url: string | null;
   is_active: boolean | null;
+  discount_percent: number | null;
   created_at: string;
 }
 
