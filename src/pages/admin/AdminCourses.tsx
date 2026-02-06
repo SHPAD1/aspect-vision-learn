@@ -447,9 +447,17 @@ const AdminCourses = () => {
               </p>
             )}
 
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-              <Clock className="w-4 h-4" />
-              <span>{course.duration_weeks} weeks</span>
+            <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4">
+              <div className="flex items-center gap-1">
+                <Clock className="w-4 h-4" />
+                <span>{course.duration_weeks} weeks</span>
+              </div>
+              {course.discount_percent && course.discount_percent > 0 && (
+                <Badge className="bg-destructive/10 text-destructive">
+                  <Percent className="w-3 h-3 mr-1" />
+                  {course.discount_percent}% OFF
+                </Badge>
+              )}
             </div>
 
             <Button
