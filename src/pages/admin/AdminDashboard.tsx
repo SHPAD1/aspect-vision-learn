@@ -17,6 +17,8 @@ import {
   Image,
   Ticket,
   Bell,
+  UsersRound,
+  Newspaper,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
