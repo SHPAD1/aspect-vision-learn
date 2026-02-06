@@ -53,6 +53,8 @@ import AdminRequests from "./pages/admin/AdminRequests";
 import AdminBanners from "./pages/admin/AdminBanners";
 import AdminCoupons from "./pages/admin/AdminCoupons";
 import AdminNotices from "./pages/admin/AdminNotices";
+import AdminTeam from "./pages/admin/AdminTeam";
+import AdminBlog from "./pages/admin/AdminBlog";
 // Sales pages
 import SalesDashboard from "./pages/sales/SalesDashboard";
 import SalesOverview from "./pages/sales/SalesOverview";
