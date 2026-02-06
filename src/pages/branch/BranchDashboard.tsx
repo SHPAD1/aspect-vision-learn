@@ -1,18 +1,16 @@
  import { useEffect, useState } from "react";
  import { useNavigate, Link, Outlet, useLocation } from "react-router-dom";
- import {
-   LogOut,
-   Users,
-   CreditCard,
-   Home,
-   Bell,
-   Building2,
-   BookOpen,
-   FileText,
-   BarChart3,
-   UserCog,
-   ClipboardCheck,
- } from "lucide-react";
+import {
+  LogOut,
+  Users,
+  CreditCard,
+  Home,
+  Building2,
+  BookOpen,
+  BarChart3,
+  UserCog,
+  ClipboardCheck,
+} from "lucide-react";
  import { Button } from "@/components/ui/button";
  import { useAuth } from "@/hooks/useAuth";
  import { useToast } from "@/hooks/use-toast";

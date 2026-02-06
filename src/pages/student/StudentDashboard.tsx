@@ -11,7 +11,6 @@ import {
   Menu,
   X,
   Home,
-  Bell,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
