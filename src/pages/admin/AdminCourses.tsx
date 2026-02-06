@@ -161,6 +161,7 @@ const AdminCourses = () => {
       duration_weeks: course.duration_weeks.toString(),
       thumbnail_url: course.thumbnail_url || "",
       is_active: course.is_active ?? true,
+      discount_percent: (course.discount_percent ?? 0).toString(),
     });
     setIsEditDialogOpen(true);
   };
