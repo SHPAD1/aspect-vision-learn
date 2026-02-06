@@ -102,6 +102,15 @@ const App = () => (
            <Route path="/batches" element={<AllBatches />} />
            <Route path="/career-counseling" element={<CareerCounseling />} />
            <Route path="/admission-assistance" element={<AdmissionAssistance />} />
+           <Route path="/team" element={<Team />} />
+           <Route path="/blog" element={<Blog />} />
+           <Route path="/blog/:slug" element={<BlogPost />} />
+           <Route path="/faq" element={<FAQ />} />
+           <Route path="/privacy" element={<PrivacyPolicy />} />
+           <Route path="/terms" element={<TermsOfService />} />
+           <Route path="/corporate" element={<CorporateTraining />} />
+           <Route path="/batch/:id" element={<BatchDetail />} />
+           <Route path="/payment/:batchId" element={<PaymentPage />} />
             
             {/* Student Dashboard */}
             <Route path="/dashboard" element={<StudentDashboard />}>
