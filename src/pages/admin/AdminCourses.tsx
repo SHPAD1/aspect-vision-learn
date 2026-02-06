@@ -109,6 +109,7 @@ const AdminCourses = () => {
       duration_weeks: "12",
       thumbnail_url: "",
       is_active: true,
+      discount_percent: "0",
     });
   };
 
