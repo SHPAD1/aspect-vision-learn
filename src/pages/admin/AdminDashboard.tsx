@@ -15,7 +15,8 @@ import {
   Calendar,
   BookOpen,
   FileText,
-   Image,
+  Image,
+  Ticket,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
