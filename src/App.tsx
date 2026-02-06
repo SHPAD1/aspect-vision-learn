@@ -83,6 +83,7 @@ import BranchEmployees from "./pages/branch/BranchEmployees";
 import BranchPayments from "./pages/branch/BranchPayments";
 import BranchReports from "./pages/branch/BranchReports";
 import BranchAnalytics from "./pages/branch/BranchAnalytics";
+import BranchBlog from "./pages/branch/BranchBlog";
 
 const queryClient = new QueryClient();
 
