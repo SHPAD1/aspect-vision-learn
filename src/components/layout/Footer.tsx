@@ -5,14 +5,14 @@ import logo from "@/assets/logo.png";
 const footerLinks = {
   company: [
     { label: "About Us", href: "/about" },
-    { label: "Careers", href: "/careers" },
+    { label: "Careers", href: "https://careerlink-suite.vercel.app/", external: true },
     { label: "Our Team", href: "/team" },
     { label: "Blog", href: "/blog" },
   ],
   programs: [
     { label: "All Batches", href: "/batches" },
     { label: "Enroll Course", href: "/#batches" },
-    { label: "Success Stories", href: "/success-stories" },
+    { label: "Success Stories", href: "/blog?tab=success_story" },
     { label: "Corporate Training", href: "/corporate" },
   ],
   support: [
