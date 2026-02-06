@@ -269,11 +269,8 @@ import logo from "@/assets/logo.png";
                  </div>
                </div>
                <div className="flex items-center gap-2">
-                <RequestDialog />
-                 <Button variant="ghost" size="icon" className="relative">
-                   <Bell className="w-5 h-5" />
-                   <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full" />
-                 </Button>
+                  <RequestDialog />
+                  <NotificationBell canSend={true} branchOnly={true} userBranchId={branchInfo?.id} />
                </div>
              </div>
            </header>
