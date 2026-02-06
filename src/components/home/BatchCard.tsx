@@ -45,6 +45,14 @@ export function BatchCard({ batch, onViewDetails, onEnroll }: BatchCardProps) {
     }).format(amount);
   };
 
+  const getDiscountedPrice = (price: number, discount: number | null | undefined) => {
+    if (!discount || discount <= 0) return price;
+    return price - (price * discount) / 100;
+  };
+
+  const hasDiscount = batch.discount_percent && batch.discount_percent > 0;
+  const discountedPrice = getDiscountedPrice(batch.fees, batch.discount_percent);
+
   return (
     <div className="card-elevated group overflow-hidden">
       {/* Image */}
@@ -55,9 +63,17 @@ export function BatchCard({ batch, onViewDetails, onEnroll }: BatchCardProps) {
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 to-transparent" />
-        <Badge className={cn("absolute top-4 left-4", modeConfig[batch.mode].className)}>
-          {modeConfig[batch.mode].label}
-        </Badge>
+        <div className="absolute top-4 left-4 flex items-center gap-2">
+          <Badge className={cn(modeConfig[batch.mode].className)}>
+            {modeConfig[batch.mode].label}
+          </Badge>
+          {hasDiscount && (
+            <Badge className="bg-destructive text-destructive-foreground">
+              <Percent className="w-3 h-3 mr-1" />
+              {batch.discount_percent}% OFF
+            </Badge>
+          )}
+        </div>
       </div>
 
       {/* Content */}
