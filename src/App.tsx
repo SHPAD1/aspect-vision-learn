@@ -25,6 +25,15 @@ import CourseBrowser from "./pages/student/CourseBrowser";
  import AllBatches from "./pages/AllBatches";
  import CareerCounseling from "./pages/CareerCounseling";
  import AdmissionAssistance from "./pages/AdmissionAssistance";
+ import Team from "./pages/Team";
+ import Blog from "./pages/Blog";
+ import BlogPost from "./pages/BlogPost";
+ import FAQ from "./pages/FAQ";
+ import PrivacyPolicy from "./pages/PrivacyPolicy";
+ import TermsOfService from "./pages/TermsOfService";
+ import CorporateTraining from "./pages/CorporateTraining";
+ import BatchDetail from "./pages/BatchDetail";
+ import PaymentPage from "./pages/PaymentPage";
  
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
