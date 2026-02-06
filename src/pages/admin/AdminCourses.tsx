@@ -7,6 +7,7 @@ import {
   Clock,
   Loader2,
   Tag,
+  Percent,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +40,7 @@ interface Course {
   duration_weeks: number;
   thumbnail_url: string | null;
   is_active: boolean | null;
+  discount_percent: number | null;
   created_at: string;
 }
 
@@ -71,6 +73,7 @@ const AdminCourses = () => {
     duration_weeks: "12",
     thumbnail_url: "",
     is_active: true,
+    discount_percent: "0",
   });
   const { toast } = useToast();
 
@@ -107,6 +110,7 @@ const AdminCourses = () => {
       duration_weeks: "12",
       thumbnail_url: "",
       is_active: true,
+      discount_percent: "0",
     });
   };
 
@@ -129,6 +133,7 @@ const AdminCourses = () => {
         duration_weeks: parseInt(formData.duration_weeks) || 12,
         thumbnail_url: formData.thumbnail_url.trim() || null,
         is_active: formData.is_active,
+        discount_percent: parseInt(formData.discount_percent) || 0,
       });
 
       if (error) throw error;
@@ -157,6 +162,7 @@ const AdminCourses = () => {
       duration_weeks: course.duration_weeks.toString(),
       thumbnail_url: course.thumbnail_url || "",
       is_active: course.is_active ?? true,
+      discount_percent: (course.discount_percent ?? 0).toString(),
     });
     setIsEditDialogOpen(true);
   };
@@ -183,6 +189,7 @@ const AdminCourses = () => {
           duration_weeks: parseInt(formData.duration_weeks) || 12,
           thumbnail_url: formData.thumbnail_url.trim() || null,
           is_active: formData.is_active,
+          discount_percent: parseInt(formData.discount_percent) || 0,
         })
         .eq("id", selectedCourse.id);
 
@@ -270,16 +277,35 @@ const AdminCourses = () => {
           />
         </div>
       </div>
-      <div>
-        <Label htmlFor="thumbnail">Thumbnail URL</Label>
-        <Input
-          id="thumbnail"
-          value={formData.thumbnail_url}
-          onChange={(e) =>
-            setFormData({ ...formData, thumbnail_url: e.target.value })
-          }
-          placeholder="https://example.com/image.jpg"
-        />
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="thumbnail">Thumbnail URL</Label>
+          <Input
+            id="thumbnail"
+            value={formData.thumbnail_url}
+            onChange={(e) =>
+              setFormData({ ...formData, thumbnail_url: e.target.value })
+            }
+            placeholder="https://example.com/image.jpg"
+          />
+        </div>
+        <div>
+          <Label htmlFor="discount">Discount Percent</Label>
+          <div className="relative">
+            <Input
+              id="discount"
+              type="number"
+              value={formData.discount_percent}
+              onChange={(e) =>
+                setFormData({ ...formData, discount_percent: e.target.value })
+              }
+              min="0"
+              max="100"
+              className="pr-8"
+            />
+            <Percent className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          </div>
+        </div>
       </div>
       <div className="flex items-center justify-between">
         <Label htmlFor="is-active">Course Active</Label>
@@ -421,9 +447,17 @@ const AdminCourses = () => {
               </p>
             )}
 
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-              <Clock className="w-4 h-4" />
-              <span>{course.duration_weeks} weeks</span>
+            <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4">
+              <div className="flex items-center gap-1">
+                <Clock className="w-4 h-4" />
+                <span>{course.duration_weeks} weeks</span>
+              </div>
+              {course.discount_percent && course.discount_percent > 0 && (
+                <Badge className="bg-destructive/10 text-destructive">
+                  <Percent className="w-3 h-3 mr-1" />
+                  {course.discount_percent}% OFF
+                </Badge>
+              )}
             </div>
 
             <Button
