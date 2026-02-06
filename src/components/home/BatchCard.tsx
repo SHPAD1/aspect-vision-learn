@@ -111,11 +111,27 @@ export function BatchCard({ batch, onViewDetails, onEnroll }: BatchCardProps) {
 
         {/* Price & Actions */}
         <div className="flex items-center justify-between pt-4 border-t border-border">
-          <div className="flex items-center gap-1">
-            <IndianRupee className="w-5 h-5 text-foreground" />
-            <span className="font-heading text-xl font-bold text-foreground">
-              {formatCurrency(batch.fees).replace("₹", "")}
-            </span>
+          <div>
+            {hasDiscount ? (
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
+                  <IndianRupee className="w-4 h-4 text-foreground" />
+                  <span className="font-heading text-lg font-bold text-foreground">
+                    {formatCurrency(discountedPrice).replace("₹", "")}
+                  </span>
+                </div>
+                <span className="text-sm text-muted-foreground line-through">
+                  ₹{formatCurrency(batch.fees).replace("₹", "")}
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1">
+                <IndianRupee className="w-5 h-5 text-foreground" />
+                <span className="font-heading text-xl font-bold text-foreground">
+                  {formatCurrency(batch.fees).replace("₹", "")}
+                </span>
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <Button
