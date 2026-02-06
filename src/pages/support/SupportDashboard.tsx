@@ -3,7 +3,6 @@ import { useNavigate, Link, Outlet, useLocation } from "react-router-dom";
 import {
   LogOut,
   Home,
-  Bell,
   Ticket,
   UserCircle,
   BarChart3,
@@ -30,6 +29,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { HelpSupportDialog } from "@/components/shared/HelpSupportDialog";
 import { RequestDialog } from "@/components/shared/RequestDialog";
+import { NotificationBell } from "@/components/shared/NotificationBell";
 import logo from "@/assets/logo.png";
 
 const navItems = [
@@ -193,10 +193,7 @@ const SupportDashboard = () => {
               <div className="flex items-center gap-2">
                 <HelpSupportDialog variant="sales" />
                 <RequestDialog />
-                <Button variant="ghost" size="icon" className="relative">
-                  <Bell className="w-5 h-5" />
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-info rounded-full" />
-                </Button>
+                <NotificationBell />
               </div>
             </div>
           </header>

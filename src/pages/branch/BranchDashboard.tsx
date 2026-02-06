@@ -1,18 +1,16 @@
  import { useEffect, useState } from "react";
  import { useNavigate, Link, Outlet, useLocation } from "react-router-dom";
- import {
-   LogOut,
-   Users,
-   CreditCard,
-   Home,
-   Bell,
-   Building2,
-   BookOpen,
-   FileText,
-   BarChart3,
-   UserCog,
-   ClipboardCheck,
- } from "lucide-react";
+import {
+  LogOut,
+  Users,
+  CreditCard,
+  Home,
+  Building2,
+  BookOpen,
+  BarChart3,
+  UserCog,
+  ClipboardCheck,
+} from "lucide-react";
  import { Button } from "@/components/ui/button";
  import { useAuth } from "@/hooks/useAuth";
  import { useToast } from "@/hooks/use-toast";
@@ -32,9 +30,10 @@
    SidebarTrigger,
    useSidebar,
  } from "@/components/ui/sidebar";
- import { Separator } from "@/components/ui/separator";
- import { RequestDialog } from "@/components/shared/RequestDialog";
- import logo from "@/assets/logo.png";
+import { Separator } from "@/components/ui/separator";
+import { RequestDialog } from "@/components/shared/RequestDialog";
+import { NotificationBell } from "@/components/shared/NotificationBell";
+import logo from "@/assets/logo.png";
  
  interface BranchInfo {
    id: string;
@@ -268,11 +267,8 @@
                  </div>
                </div>
                <div className="flex items-center gap-2">
-                <RequestDialog />
-                 <Button variant="ghost" size="icon" className="relative">
-                   <Bell className="w-5 h-5" />
-                   <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full" />
-                 </Button>
+                  <RequestDialog />
+                  <NotificationBell canSend={true} branchOnly={true} userBranchId={branchInfo?.id} />
                </div>
              </div>
            </header>

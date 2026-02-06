@@ -11,12 +11,12 @@ import {
   Menu,
   X,
   Home,
-  Bell,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { HelpSupportDialog } from "@/components/shared/HelpSupportDialog";
+import { NotificationBell } from "@/components/shared/NotificationBell";
 import logo from "@/assets/logo.png";
 
 const sidebarLinks = [
@@ -176,10 +176,7 @@ const StudentDashboard = () => {
             </div>
             <div className="flex items-center gap-2">
               <HelpSupportDialog variant="student" />
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="w-5 h-5" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-accent rounded-full" />
-              </Button>
+              <NotificationBell />
             </div>
           </div>
         </header>
