@@ -277,16 +277,35 @@ const AdminCourses = () => {
           />
         </div>
       </div>
-      <div>
-        <Label htmlFor="thumbnail">Thumbnail URL</Label>
-        <Input
-          id="thumbnail"
-          value={formData.thumbnail_url}
-          onChange={(e) =>
-            setFormData({ ...formData, thumbnail_url: e.target.value })
-          }
-          placeholder="https://example.com/image.jpg"
-        />
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="thumbnail">Thumbnail URL</Label>
+          <Input
+            id="thumbnail"
+            value={formData.thumbnail_url}
+            onChange={(e) =>
+              setFormData({ ...formData, thumbnail_url: e.target.value })
+            }
+            placeholder="https://example.com/image.jpg"
+          />
+        </div>
+        <div>
+          <Label htmlFor="discount">Discount Percent</Label>
+          <div className="relative">
+            <Input
+              id="discount"
+              type="number"
+              value={formData.discount_percent}
+              onChange={(e) =>
+                setFormData({ ...formData, discount_percent: e.target.value })
+              }
+              min="0"
+              max="100"
+              className="pr-8"
+            />
+            <Percent className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          </div>
+        </div>
       </div>
       <div className="flex items-center justify-between">
         <Label htmlFor="is-active">Course Active</Label>

@@ -45,8 +45,9 @@ const mainNavItems = [
   { icon: CreditCard, label: "Payments", href: "/admin/payments" },
   { icon: BookOpen, label: "Batches", href: "/admin/batches" },
   { icon: BookOpen, label: "Courses", href: "/admin/courses" },
+  { icon: Ticket, label: "Coupons", href: "/admin/coupons" },
   { icon: FileText, label: "Requests", href: "/admin/requests" },
-   { icon: Image, label: "Banners", href: "/admin/banners" },
+  { icon: Image, label: "Banners", href: "/admin/banners" },
 ];
 
 const managementItems = [
