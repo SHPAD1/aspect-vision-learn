@@ -410,6 +410,59 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          notification_type: string | null
+          sent_by: string | null
+          target_branch_id: string | null
+          target_department: string | null
+          target_role: string | null
+          target_type: string
+          target_user_id: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          notification_type?: string | null
+          sent_by?: string | null
+          target_branch_id?: string | null
+          target_department?: string | null
+          target_role?: string | null
+          target_type?: string
+          target_user_id?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          notification_type?: string | null
+          sent_by?: string | null
+          target_branch_id?: string | null
+          target_department?: string | null
+          target_role?: string | null
+          target_type?: string
+          target_user_id?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_target_branch_id_fkey"
+            columns: ["target_branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -463,6 +516,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      popup_notices: {
+        Row: {
+          button_link: string | null
+          button_text: string | null
+          content: string
+          created_at: string | null
+          created_by: string | null
+          display_order: number | null
+          end_date: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          start_date: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          button_link?: string | null
+          button_text?: string | null
+          content: string
+          created_at?: string | null
+          created_by?: string | null
+          display_order?: number | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          start_date?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          button_link?: string | null
+          button_text?: string | null
+          content?: string
+          created_at?: string | null
+          created_by?: string | null
+          display_order?: number | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          start_date?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -634,6 +735,7 @@ export type Database = {
         Row: {
           assigned_to: string | null
           created_at: string
+          department: string | null
           description: string
           id: string
           priority: string
@@ -645,6 +747,7 @@ export type Database = {
         Insert: {
           assigned_to?: string | null
           created_at?: string
+          department?: string | null
           description: string
           id?: string
           priority?: string
@@ -656,6 +759,7 @@ export type Database = {
         Update: {
           assigned_to?: string | null
           created_at?: string
+          department?: string | null
           description?: string
           id?: string
           priority?: string
@@ -665,6 +769,41 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      ticket_replies: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_support_reply: boolean | null
+          message: string
+          ticket_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_support_reply?: boolean | null
+          message: string
+          ticket_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_support_reply?: boolean | null
+          message?: string
+          ticket_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_replies_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
