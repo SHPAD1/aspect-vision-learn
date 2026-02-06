@@ -46,7 +46,8 @@ export function BatchesSection() {
           courses (
             name,
             duration_weeks,
-            thumbnail_url
+            thumbnail_url,
+            discount_percent
           ),
           branches (
             name
