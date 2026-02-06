@@ -16,6 +16,7 @@ interface BatchCardProps {
     description: string;
     schedule: string;
     thumbnail_url?: string;
+    discount_percent?: number | null;
   };
   onViewDetails: (id: string) => void;
   onEnroll: (id: string) => void;
