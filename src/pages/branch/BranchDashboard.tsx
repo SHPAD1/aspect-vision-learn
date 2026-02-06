@@ -55,10 +55,11 @@ import logo from "@/assets/logo.png";
    { icon: CreditCard, label: "Fee & Payments", href: "/branch/payments" },
  ];
  
- const reportsItems = [
-   { icon: ClipboardCheck, label: "Report Approval", href: "/branch/reports" },
-   { icon: BarChart3, label: "Analytics", href: "/branch/analytics" },
- ];
+const reportsItems = [
+  { icon: ClipboardCheck, label: "Report Approval", href: "/branch/reports" },
+  { icon: BarChart3, label: "Analytics", href: "/branch/analytics" },
+  { icon: Newspaper, label: "Blog & Stories", href: "/branch/blog" },
+];
  
  function BranchSidebar({ branchInfo }: { branchInfo: BranchInfo | null }) {
    const location = useLocation();
