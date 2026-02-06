@@ -18,6 +18,7 @@ interface Batch {
   description: string;
   schedule: string;
   thumbnail_url?: string;
+  discount_percent?: number | null;
 }
 
 export function BatchesSection() {
