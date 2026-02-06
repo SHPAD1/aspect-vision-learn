@@ -32,9 +32,10 @@
    SidebarTrigger,
    useSidebar,
  } from "@/components/ui/sidebar";
- import { Separator } from "@/components/ui/separator";
- import { RequestDialog } from "@/components/shared/RequestDialog";
- import logo from "@/assets/logo.png";
+import { Separator } from "@/components/ui/separator";
+import { RequestDialog } from "@/components/shared/RequestDialog";
+import { NotificationBell } from "@/components/shared/NotificationBell";
+import logo from "@/assets/logo.png";
  
  interface BranchInfo {
    id: string;
