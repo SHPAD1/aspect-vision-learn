@@ -7,6 +7,7 @@ import {
   Clock,
   Loader2,
   Tag,
+  Percent,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
