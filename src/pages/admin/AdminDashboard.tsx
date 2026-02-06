@@ -6,7 +6,6 @@ import {
   CreditCard,
   Settings,
   Home,
-  Bell,
   UserPlus,
   Building2,
   Youtube,
@@ -17,6 +16,7 @@ import {
   FileText,
   Image,
   Ticket,
+  Bell,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -37,6 +37,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
+import { NotificationBell } from "@/components/shared/NotificationBell";
 import logo from "@/assets/logo.png";
 
 const mainNavItems = [
@@ -48,6 +49,7 @@ const mainNavItems = [
   { icon: Ticket, label: "Coupons", href: "/admin/coupons" },
   { icon: FileText, label: "Requests", href: "/admin/requests" },
   { icon: Image, label: "Banners", href: "/admin/banners" },
+  { icon: Bell, label: "Notices", href: "/admin/notices" },
 ];
 
 const managementItems = [
