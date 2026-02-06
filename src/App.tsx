@@ -41,7 +41,8 @@ import AdminYoutube from "./pages/admin/AdminYoutube";
 import AdminBatches from "./pages/admin/AdminBatches";
 import AdminCourses from "./pages/admin/AdminCourses";
 import AdminRequests from "./pages/admin/AdminRequests";
- import AdminBanners from "./pages/admin/AdminBanners";
+import AdminBanners from "./pages/admin/AdminBanners";
+import AdminCoupons from "./pages/admin/AdminCoupons";
 // Sales pages
 import SalesDashboard from "./pages/sales/SalesDashboard";
 import SalesOverview from "./pages/sales/SalesOverview";
