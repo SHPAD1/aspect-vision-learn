@@ -176,6 +176,7 @@ const App = () => (
               <Route path="payments" element={<BranchPayments />} />
               <Route path="reports" element={<BranchReports />} />
               <Route path="analytics" element={<BranchAnalytics />} />
+              <Route path="blog" element={<BranchBlog />} />
             </Route>
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
