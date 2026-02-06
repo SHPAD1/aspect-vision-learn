@@ -25,6 +25,15 @@ import CourseBrowser from "./pages/student/CourseBrowser";
  import AllBatches from "./pages/AllBatches";
  import CareerCounseling from "./pages/CareerCounseling";
  import AdmissionAssistance from "./pages/AdmissionAssistance";
+ import Team from "./pages/Team";
+ import Blog from "./pages/Blog";
+ import BlogPost from "./pages/BlogPost";
+ import FAQ from "./pages/FAQ";
+ import PrivacyPolicy from "./pages/PrivacyPolicy";
+ import TermsOfService from "./pages/TermsOfService";
+ import CorporateTraining from "./pages/CorporateTraining";
+ import BatchDetail from "./pages/BatchDetail";
+ import PaymentPage from "./pages/PaymentPage";
  
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -44,6 +53,8 @@ import AdminRequests from "./pages/admin/AdminRequests";
 import AdminBanners from "./pages/admin/AdminBanners";
 import AdminCoupons from "./pages/admin/AdminCoupons";
 import AdminNotices from "./pages/admin/AdminNotices";
+import AdminTeam from "./pages/admin/AdminTeam";
+import AdminBlog from "./pages/admin/AdminBlog";
 // Sales pages
 import SalesDashboard from "./pages/sales/SalesDashboard";
 import SalesOverview from "./pages/sales/SalesOverview";
@@ -72,6 +83,7 @@ import BranchEmployees from "./pages/branch/BranchEmployees";
 import BranchPayments from "./pages/branch/BranchPayments";
 import BranchReports from "./pages/branch/BranchReports";
 import BranchAnalytics from "./pages/branch/BranchAnalytics";
+import BranchBlog from "./pages/branch/BranchBlog";
 
 const queryClient = new QueryClient();
 
@@ -91,6 +103,15 @@ const App = () => (
            <Route path="/batches" element={<AllBatches />} />
            <Route path="/career-counseling" element={<CareerCounseling />} />
            <Route path="/admission-assistance" element={<AdmissionAssistance />} />
+           <Route path="/team" element={<Team />} />
+           <Route path="/blog" element={<Blog />} />
+           <Route path="/blog/:slug" element={<BlogPost />} />
+           <Route path="/faq" element={<FAQ />} />
+           <Route path="/privacy" element={<PrivacyPolicy />} />
+           <Route path="/terms" element={<TermsOfService />} />
+           <Route path="/corporate" element={<CorporateTraining />} />
+           <Route path="/batch/:id" element={<BatchDetail />} />
+           <Route path="/payment/:batchId" element={<PaymentPage />} />
             
             {/* Student Dashboard */}
             <Route path="/dashboard" element={<StudentDashboard />}>
@@ -115,6 +136,8 @@ const App = () => (
               <Route path="banners" element={<AdminBanners />} />
               <Route path="coupons" element={<AdminCoupons />} />
               <Route path="notices" element={<AdminNotices />} />
+              <Route path="team" element={<AdminTeam />} />
+              <Route path="blog" element={<AdminBlog />} />
               <Route path="performance" element={<AdminPerformance />} />
               <Route path="salary" element={<AdminSalary />} />
               <Route path="reports" element={<AdminReports />} />
@@ -153,6 +176,7 @@ const App = () => (
               <Route path="payments" element={<BranchPayments />} />
               <Route path="reports" element={<BranchReports />} />
               <Route path="analytics" element={<BranchAnalytics />} />
+              <Route path="blog" element={<BranchBlog />} />
             </Route>
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

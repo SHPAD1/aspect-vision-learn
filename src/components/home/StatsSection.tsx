@@ -4,7 +4,7 @@
    { icon: Users, value: "300+", label: "Students Trained" },
    { icon: BookOpen, value: "25+", label: "Expert Courses" },
    { icon: Trophy, value: "98%", label: "Selection Rate" },
-   { icon: GraduationCap, value: "50+", label: "Expert Faculty" },
+   { icon: GraduationCap, value: "20+", label: "Expert Faculty" },
  ];
  
  export function StatsSection() {

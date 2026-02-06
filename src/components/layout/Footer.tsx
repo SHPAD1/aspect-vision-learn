@@ -5,14 +5,14 @@ import logo from "@/assets/logo.png";
 const footerLinks = {
   company: [
     { label: "About Us", href: "/about" },
-    { label: "Careers", href: "/careers" },
+    { label: "Careers", href: "https://careerlink-suite.vercel.app/", external: true },
     { label: "Our Team", href: "/team" },
     { label: "Blog", href: "/blog" },
   ],
   programs: [
     { label: "All Batches", href: "/batches" },
     { label: "Enroll Course", href: "/#batches" },
-    { label: "Success Stories", href: "/success-stories" },
+    { label: "Success Stories", href: "/blog?tab=success_story" },
     { label: "Corporate Training", href: "/corporate" },
   ],
   support: [
@@ -24,10 +24,10 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { icon: Instagram, href: "https://instagram.com/aspectvision", label: "Instagram" },
-  { icon: Linkedin, href: "https://linkedin.com/company/aspectvision", label: "LinkedIn" },
-  { icon: Youtube, href: "https://youtube.com/@aspectvision", label: "YouTube" },
-  { icon: Facebook, href: "https://facebook.com/aspectvision", label: "Facebook" },
+  { icon: Instagram, href: "https://www.instagram.com/aspectvisionofficial?igsh=MXJlaGY2dTVxMjMzMQ==", label: "Instagram" },
+  { icon: Linkedin, href: "https://www.linkedin.com/company/aspect-vision/", label: "LinkedIn" },
+  { icon: Youtube, href: "https://www.youtube.com/@AspectVision", label: "YouTube" },
+  { icon: Facebook, href: "https://www.facebook.com/share/1GGPuy97hi/", label: "Facebook" },
 ];
 
 const offices = [
@@ -93,12 +93,23 @@ export function Footer() {
             <ul className="space-y-2">
               {footerLinks.company.map((link) => (
                 <li key={link.href}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-sidebar-foreground/70 hover:text-primary transition-colors"
-                  >
-                    {link.label}
-                  </Link>
+                  {(link as any).external ? (
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-sidebar-foreground/70 hover:text-primary transition-colors"
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <Link
+                      to={link.href}
+                      className="text-sm text-sidebar-foreground/70 hover:text-primary transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

@@ -1,4 +1,4 @@
-import { Calendar, Clock, MapPin, Users, IndianRupee } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, IndianRupee, Percent } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,7 @@ interface BatchCardProps {
     description: string;
     schedule: string;
     thumbnail_url?: string;
+    discount_percent?: number | null;
   };
   onViewDetails: (id: string) => void;
   onEnroll: (id: string) => void;
@@ -44,6 +45,14 @@ export function BatchCard({ batch, onViewDetails, onEnroll }: BatchCardProps) {
     }).format(amount);
   };
 
+  const getDiscountedPrice = (price: number, discount: number | null | undefined) => {
+    if (!discount || discount <= 0) return price;
+    return price - (price * discount) / 100;
+  };
+
+  const hasDiscount = batch.discount_percent && batch.discount_percent > 0;
+  const discountedPrice = getDiscountedPrice(batch.fees, batch.discount_percent);
+
   return (
     <div className="card-elevated group overflow-hidden">
       {/* Image */}
@@ -54,9 +63,17 @@ export function BatchCard({ batch, onViewDetails, onEnroll }: BatchCardProps) {
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 to-transparent" />
-        <Badge className={cn("absolute top-4 left-4", modeConfig[batch.mode].className)}>
-          {modeConfig[batch.mode].label}
-        </Badge>
+        <div className="absolute top-4 left-4 flex items-center gap-2">
+          <Badge className={cn(modeConfig[batch.mode].className)}>
+            {modeConfig[batch.mode].label}
+          </Badge>
+          {hasDiscount && (
+            <Badge className="bg-destructive text-destructive-foreground">
+              <Percent className="w-3 h-3 mr-1" />
+              {batch.discount_percent}% OFF
+            </Badge>
+          )}
+        </div>
       </div>
 
       {/* Content */}
@@ -94,11 +111,27 @@ export function BatchCard({ batch, onViewDetails, onEnroll }: BatchCardProps) {
 
         {/* Price & Actions */}
         <div className="flex items-center justify-between pt-4 border-t border-border">
-          <div className="flex items-center gap-1">
-            <IndianRupee className="w-5 h-5 text-foreground" />
-            <span className="font-heading text-xl font-bold text-foreground">
-              {formatCurrency(batch.fees).replace("₹", "")}
-            </span>
+          <div>
+            {hasDiscount ? (
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
+                  <IndianRupee className="w-4 h-4 text-foreground" />
+                  <span className="font-heading text-lg font-bold text-foreground">
+                    {formatCurrency(discountedPrice).replace("₹", "")}
+                  </span>
+                </div>
+                <span className="text-sm text-muted-foreground line-through">
+                  ₹{formatCurrency(batch.fees).replace("₹", "")}
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1">
+                <IndianRupee className="w-5 h-5 text-foreground" />
+                <span className="font-heading text-xl font-bold text-foreground">
+                  {formatCurrency(batch.fees).replace("₹", "")}
+                </span>
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <Button

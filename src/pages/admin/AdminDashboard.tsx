@@ -17,6 +17,8 @@ import {
   Image,
   Ticket,
   Bell,
+  UsersRound,
+  Newspaper,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -50,6 +52,8 @@ const mainNavItems = [
   { icon: FileText, label: "Requests", href: "/admin/requests" },
   { icon: Image, label: "Banners", href: "/admin/banners" },
   { icon: Bell, label: "Notices", href: "/admin/notices" },
+  { icon: UsersRound, label: "Team", href: "/admin/team" },
+  { icon: Newspaper, label: "Blog & Stories", href: "/admin/blog" },
 ];
 
 const managementItems = [

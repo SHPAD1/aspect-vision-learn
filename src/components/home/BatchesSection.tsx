@@ -18,6 +18,7 @@ interface Batch {
   description: string;
   schedule: string;
   thumbnail_url?: string;
+  discount_percent?: number | null;
 }
 
 export function BatchesSection() {
@@ -45,7 +46,8 @@ export function BatchesSection() {
           courses (
             name,
             duration_weeks,
-            thumbnail_url
+            thumbnail_url,
+            discount_percent
           ),
           branches (
             name
@@ -69,6 +71,7 @@ export function BatchesSection() {
         description: batch.description || "",
         schedule: batch.schedule || "TBD",
         thumbnail_url: batch.courses?.thumbnail_url,
+        discount_percent: batch.courses?.discount_percent,
       }));
 
       setBatches(formattedBatches);
