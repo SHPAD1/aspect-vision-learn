@@ -129,43 +129,55 @@ const reportsItems = [
          </Link>
        </SidebarHeader>
  
-       <SidebarContent>
-         {/* Main Navigation */}
-         <SidebarGroup>
-           <SidebarGroupLabel>Main</SidebarGroupLabel>
-           <SidebarGroupContent>
-             <SidebarMenu>
-               {mainNavItems.map((item) => (
-                 <NavItem key={item.href} item={item} />
-               ))}
-             </SidebarMenu>
-           </SidebarGroupContent>
-         </SidebarGroup>
- 
-         {/* Management */}
-         <SidebarGroup>
-           <SidebarGroupLabel>Management</SidebarGroupLabel>
-           <SidebarGroupContent>
-             <SidebarMenu>
-               {managementItems.map((item) => (
-                 <NavItem key={item.href} item={item} />
-               ))}
-             </SidebarMenu>
-           </SidebarGroupContent>
-         </SidebarGroup>
- 
-         {/* Reports */}
-         <SidebarGroup>
-           <SidebarGroupLabel>Reports & Analytics</SidebarGroupLabel>
-           <SidebarGroupContent>
-             <SidebarMenu>
-               {reportsItems.map((item) => (
-                 <NavItem key={item.href} item={item} />
-               ))}
-             </SidebarMenu>
-           </SidebarGroupContent>
-         </SidebarGroup>
-       </SidebarContent>
+      <SidebarContent>
+        {/* Main Navigation */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Main</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {mainNavItems.map((item) => (
+                <NavItem key={item.href} item={item} />
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Departments */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Departments</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {departmentItems.map((item) => (
+                <NavItem key={item.href} item={item} />
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Management */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Management</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {managementItems.map((item) => (
+                <NavItem key={item.href} item={item} />
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Reports */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Reports & Analytics</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {reportsItems.map((item) => (
+                <NavItem key={item.href} item={item} />
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
  
        <SidebarFooter className="border-t border-sidebar-border">
          <div className="p-2">
