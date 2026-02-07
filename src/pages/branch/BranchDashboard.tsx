@@ -1,5 +1,5 @@
- import { useEffect, useState } from "react";
- import { useNavigate, Link, Outlet, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, Link, Outlet, useLocation } from "react-router-dom";
 import {
   LogOut,
   Users,
@@ -11,52 +11,66 @@ import {
   UserCog,
   ClipboardCheck,
   Newspaper,
+  TrendingUp,
+  Headphones,
+  GraduationCap,
+  FileText,
+  Settings,
+  Target,
 } from "lucide-react";
- import { Button } from "@/components/ui/button";
- import { useAuth } from "@/hooks/useAuth";
- import { useToast } from "@/hooks/use-toast";
- import { supabase } from "@/integrations/supabase/client";
- import {
-   Sidebar,
-   SidebarContent,
-   SidebarFooter,
-   SidebarGroup,
-   SidebarGroupContent,
-   SidebarGroupLabel,
-   SidebarHeader,
-   SidebarMenu,
-   SidebarMenuButton,
-   SidebarMenuItem,
-   SidebarProvider,
-   SidebarTrigger,
-   useSidebar,
- } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+  useSidebar,
+} from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { RequestDialog } from "@/components/shared/RequestDialog";
 import { NotificationBell } from "@/components/shared/NotificationBell";
 import logo from "@/assets/logo.png";
  
- interface BranchInfo {
-   id: string;
-   name: string;
-   code: string;
-   city: string;
- }
+interface BranchInfo {
+  id: string;
+  name: string;
+  code: string;
+  city: string;
+}
  
- const mainNavItems = [
-   { icon: Home, label: "Overview", href: "/branch" },
-   { icon: Building2, label: "Branch Profile", href: "/branch/profile" },
-   { icon: BookOpen, label: "Batch Management", href: "/branch/batches" },
- ];
+const mainNavItems = [
+  { icon: Home, label: "Dashboard", href: "/branch" },
+  { icon: Building2, label: "Branch Profile", href: "/branch/profile" },
+  { icon: BookOpen, label: "Batch Management", href: "/branch/batches" },
+];
+
+const departmentItems = [
+  { icon: TrendingUp, label: "Sales", href: "/branch/sales" },
+  { icon: Headphones, label: "Support", href: "/branch/support" },
+  { icon: GraduationCap, label: "Teachers", href: "/branch/teachers" },
+  { icon: Users, label: "Students", href: "/branch/students" },
+];
  
- const managementItems = [
-   { icon: Users, label: "Students", href: "/branch/students" },
-   { icon: UserCog, label: "Employees", href: "/branch/employees" },
-   { icon: CreditCard, label: "Fee & Payments", href: "/branch/payments" },
- ];
- 
+const managementItems = [
+  { icon: CreditCard, label: "Financial", href: "/branch/payments" },
+  { icon: UserCog, label: "User Management", href: "/branch/users" },
+  { icon: ClipboardCheck, label: "Requests", href: "/branch/requests" },
+];
+
 const reportsItems = [
-  { icon: ClipboardCheck, label: "Report Approval", href: "/branch/reports" },
+  { icon: FileText, label: "Report Generation", href: "/branch/reports" },
+  { icon: Target, label: "Performance", href: "/branch/performance" },
   { icon: BarChart3, label: "Analytics", href: "/branch/analytics" },
   { icon: Newspaper, label: "Blog & Stories", href: "/branch/blog" },
 ];
