@@ -100,7 +100,10 @@ const BranchUserManagement = () => {
   }, [branchInfo]);
 
   const fetchEmployees = async () => {
-    if (!branchInfo?.id) return;
+    if (!branchInfo?.id) {
+      setLoading(false);
+      return;
+    }
 
     try {
       const { data: employeesData } = await supabase
@@ -133,9 +136,12 @@ const BranchUserManagement = () => {
         }));
         
         setEmployees(employeesWithDetails);
+      } else {
+        setEmployees([]);
       }
     } catch (error) {
       console.error("Error fetching employees:", error);
+      setEmployees([]);
     } finally {
       setLoading(false);
     }
