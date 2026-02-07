@@ -163,20 +163,41 @@ const AdminUsers = () => {
 
       if (rolesError) throw rolesError;
 
-      // Map roles to users
-      const usersWithRoles: UserWithRoles[] = (profiles || []).map((profile) => ({
-        id: profile.id,
-        user_id: profile.user_id,
-        full_name: profile.full_name,
-        email: profile.email,
-        phone: profile.phone,
-        city: profile.city,
-        roles: roles
-          ?.filter((r) => r.user_id === profile.user_id)
-          .map((r) => r.role) || [],
-        created_at: profile.created_at,
-        is_blocked: false, // We'll track this in profile or separate table if needed
-      }));
+      // Fetch all employees with branch info
+      const { data: employees, error: employeesError } = await supabase
+        .from("employees")
+        .select("user_id, branch_id, department");
+
+      if (employeesError) console.error("Error fetching employees:", employeesError);
+
+      // Fetch all students with branch info
+      const { data: students, error: studentsError } = await supabase
+        .from("students")
+        .select("user_id, branch_id");
+
+      if (studentsError) console.error("Error fetching students:", studentsError);
+
+      // Map roles to users with branch info
+      const usersWithRoles: UserWithRoles[] = (profiles || []).map((profile) => {
+        const employee = employees?.find((e) => e.user_id === profile.user_id);
+        const student = students?.find((s) => s.user_id === profile.user_id);
+        
+        return {
+          id: profile.id,
+          user_id: profile.user_id,
+          full_name: profile.full_name,
+          email: profile.email,
+          phone: profile.phone,
+          city: profile.city,
+          roles: roles
+            ?.filter((r) => r.user_id === profile.user_id)
+            .map((r) => r.role) || [],
+          created_at: profile.created_at,
+          is_blocked: false,
+          branch_id: employee?.branch_id || student?.branch_id || null,
+          department: employee?.department || null,
+        };
+      });
 
       setUsers(usersWithRoles);
     } catch (error) {
@@ -299,6 +320,17 @@ const AdminUsers = () => {
 
   const handleUpdateUser = async () => {
     if (!selectedUser) return;
+    
+    // Validate branch for employee roles
+    if (employeeRoles.includes(formData.role) && !formData.branch_id) {
+      toast({
+        title: "Validation Error",
+        description: "Branch selection is required for this role",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setFormLoading(true);
 
     try {
@@ -326,7 +358,64 @@ const AdminUsers = () => {
 
       if (roleError) throw roleError;
 
-      toast({ title: "Success", description: "User updated successfully" });
+      // Handle employee/student branch mapping
+      if (employeeRoles.includes(formData.role)) {
+        // Check if employee record exists
+        const { data: existingEmployee } = await supabase
+          .from("employees")
+          .select("id")
+          .eq("user_id", selectedUser.user_id)
+          .maybeSingle();
+
+        if (existingEmployee) {
+          // Update existing employee
+          await supabase
+            .from("employees")
+            .update({
+              branch_id: formData.branch_id,
+              department: formData.department || formData.role,
+            })
+            .eq("user_id", selectedUser.user_id);
+        } else {
+          // Create new employee record
+          const employeeId = `EMP-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
+          await supabase
+            .from("employees")
+            .insert({
+              user_id: selectedUser.user_id,
+              branch_id: formData.branch_id,
+              department: formData.department || formData.role,
+              employee_id: employeeId,
+            });
+        }
+      } else if (formData.role === "student" && formData.branch_id) {
+        // Check if student record exists
+        const { data: existingStudent } = await supabase
+          .from("students")
+          .select("id")
+          .eq("user_id", selectedUser.user_id)
+          .maybeSingle();
+
+        if (existingStudent) {
+          // Update existing student
+          await supabase
+            .from("students")
+            .update({ branch_id: formData.branch_id })
+            .eq("user_id", selectedUser.user_id);
+        } else {
+          // Create new student record
+          const studentId = `STU-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
+          await supabase
+            .from("students")
+            .insert({
+              user_id: selectedUser.user_id,
+              branch_id: formData.branch_id,
+              student_id: studentId,
+            });
+        }
+      }
+
+      toast({ title: "Success", description: "User updated successfully with branch mapping" });
       setIsEditDialogOpen(false);
       fetchUsers();
     } catch (error: any) {
@@ -530,7 +619,7 @@ const AdminUsers = () => {
               <TableHead>Name</TableHead>
               <TableHead>Contact</TableHead>
               <TableHead>Roles</TableHead>
-              <TableHead>City</TableHead>
+              <TableHead>Branch</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -543,110 +632,118 @@ const AdminUsers = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredUsers.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        <span className="text-sm font-medium text-primary">
-                          {user.full_name.charAt(0).toUpperCase()}
-                        </span>
+              filteredUsers.map((user) => {
+                const userBranch = branches.find((b) => b.id === user.branch_id);
+                return (
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <span className="text-sm font-medium text-primary">
+                            {user.full_name.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-medium">{user.full_name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {user.email}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium">{user.full_name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {user.email}
-                        </p>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        {user.phone ? (
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <Phone className="w-3 h-3" />
+                            {user.phone}
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm">
-                      {user.phone ? (
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Phone className="w-3 h-3" />
-                          {user.phone}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {user.roles.length > 0 ? (
+                          user.roles.map((role) => (
+                            <Badge
+                              key={role}
+                              variant="secondary"
+                              className={roleColors[role]}
+                            >
+                              {role.replace("_", " ")}
+                            </Badge>
+                          ))
+                        ) : (
+                          <Badge variant="secondary" className="bg-destructive/10 text-destructive">
+                            Blocked
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {userBranch ? (
+                        <div className="flex items-center gap-1">
+                          <Building className="w-3 h-3 text-muted-foreground" />
+                          <span className="text-sm">{userBranch.name}</span>
                         </div>
                       ) : (
                         <span className="text-muted-foreground">-</span>
                       )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {user.roles.length > 0 ? (
-                        user.roles.map((role) => (
-                          <Badge
-                            key={role}
-                            variant="secondary"
-                            className={roleColors[role]}
-                          >
-                            {role.replace("_", " ")}
-                          </Badge>
-                        ))
-                      ) : (
-                        <Badge variant="secondary" className="bg-destructive/10 text-destructive">
-                          Blocked
-                        </Badge>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-muted-foreground">
-                      {user.city || "-"}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="secondary"
-                      className={
-                        user.roles.length > 0
-                          ? "bg-success/10 text-success"
-                          : "bg-destructive/10 text-destructive"
-                      }
-                    >
-                      {user.roles.length > 0 ? "Active" : "Blocked"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEditUser(user)}
-                        title="Edit User"
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="secondary"
+                        className={
+                          user.roles.length > 0
+                            ? "bg-success/10 text-success"
+                            : "bg-destructive/10 text-destructive"
+                        }
                       >
-                        <Edit2 className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className={user.roles.length > 0 ? "text-warning hover:text-warning" : "text-success hover:text-success"}
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setIsBlockDialogOpen(true);
-                        }}
-                        title={user.roles.length > 0 ? "Block User" : "User is blocked"}
-                        disabled={user.roles.length === 0}
-                      >
-                        <Ban className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive hover:text-destructive"
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setIsDeleteDialogOpen(true);
-                        }}
-                        title="Delete User"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
+                        {user.roles.length > 0 ? "Active" : "Blocked"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEditUser(user)}
+                          title="Edit User"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className={user.roles.length > 0 ? "text-warning hover:text-warning" : "text-success hover:text-success"}
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setIsBlockDialogOpen(true);
+                          }}
+                          title={user.roles.length > 0 ? "Block User" : "User is blocked"}
+                          disabled={user.roles.length === 0}
+                        >
+                          <Ban className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-destructive hover:text-destructive"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setIsDeleteDialogOpen(true);
+                          }}
+                          title="Delete User"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
         </Table>
@@ -836,7 +933,7 @@ const AdminUsers = () => {
 
       {/* Edit User Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
           </DialogHeader>
@@ -901,6 +998,60 @@ const AdminUsers = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Branch Selection - for employee roles and students */}
+            {(employeeRoles.includes(formData.role) || formData.role === "student") && (
+              <div>
+                <Label htmlFor="edit-branch">
+                  <Building className="w-3 h-3 inline mr-1" />
+                  Branch {employeeRoles.includes(formData.role) ? "*" : "(Optional)"}
+                </Label>
+                <Select
+                  value={formData.branch_id}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, branch_id: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select branch" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {branches.map((branch) => (
+                      <SelectItem key={branch.id} value={branch.id}>
+                        {branch.name} ({branch.city})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Department - only for employee roles */}
+            {employeeRoles.includes(formData.role) && (
+              <div>
+                <Label htmlFor="edit-department">
+                  <Briefcase className="w-3 h-3 inline mr-1" />
+                  Department
+                </Label>
+                <Select
+                  value={formData.department}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, department: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {departments.map((dept) => (
+                      <SelectItem key={dept.value} value={dept.value}>
+                        {dept.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button
