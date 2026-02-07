@@ -230,33 +230,48 @@ const reportsItems = [
      }
    }, [loading, user, isBranchAdmin, navigate, toast]);
  
-   useEffect(() => {
-     const fetchBranchInfo = async () => {
-       if (!user) return;
- 
-       const { data: employee } = await supabase
-         .from("employees")
-         .select("branch_id")
-         .eq("user_id", user.id)
-         .single();
- 
-       if (employee?.branch_id) {
-         const { data: branch } = await supabase
-           .from("branches")
-           .select("id, name, code, city")
-           .eq("id", employee.branch_id)
-           .single();
- 
-         if (branch) {
-           setBranchInfo(branch);
-         }
-       }
-     };
- 
-     if (user) {
-       fetchBranchInfo();
-     }
-   }, [user]);
+  useEffect(() => {
+    const fetchBranchInfo = async () => {
+      if (!user) return;
+
+      // First try to find branch through employee record
+      const { data: employee } = await supabase
+        .from("employees")
+        .select("branch_id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (employee?.branch_id) {
+        const { data: branch } = await supabase
+          .from("branches")
+          .select("id, name, code, city")
+          .eq("id", employee.branch_id)
+          .maybeSingle();
+
+        if (branch) {
+          setBranchInfo(branch);
+          return;
+        }
+      }
+
+      // Fallback: If no employee record, get first available branch for branch admin
+      // This handles cases where branch admin isn't in employees table yet
+      const { data: branches } = await supabase
+        .from("branches")
+        .select("id, name, code, city")
+        .eq("is_active", true)
+        .order("created_at", { ascending: true })
+        .limit(1);
+
+      if (branches && branches.length > 0) {
+        setBranchInfo(branches[0]);
+      }
+    };
+
+    if (user) {
+      fetchBranchInfo();
+    }
+  }, [user]);
  
    if (loading) {
      return (
