@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import {
   Users,
   Eye,
@@ -75,11 +76,8 @@ interface Payment {
   };
 }
 
-interface BranchStudentSectionProps {
-  branchInfo: BranchInfo | null;
-}
-
-const BranchStudentSection = ({ branchInfo }: BranchStudentSectionProps) => {
+const BranchStudentSection = () => {
+  const { branchInfo } = useOutletContext<{ branchInfo: BranchInfo | null }>();
   const [view, setView] = useState<"list" | "detail">("list");
   const [students, setStudents] = useState<Student[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);

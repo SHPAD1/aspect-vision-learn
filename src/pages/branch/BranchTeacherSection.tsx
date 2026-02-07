@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import {
   GraduationCap,
   Users,
@@ -37,11 +38,8 @@ interface Teacher {
   };
 }
 
-interface BranchTeacherSectionProps {
-  branchInfo: BranchInfo | null;
-}
-
-const BranchTeacherSection = ({ branchInfo }: BranchTeacherSectionProps) => {
+const BranchTeacherSection = () => {
+  const { branchInfo } = useOutletContext<{ branchInfo: BranchInfo | null }>();
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [loading, setLoading] = useState(true);
 

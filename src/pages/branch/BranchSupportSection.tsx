@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import {
   Headphones,
   Users,
@@ -55,11 +56,8 @@ interface Ticket {
   user_id: string;
 }
 
-interface BranchSupportSectionProps {
-  branchInfo: BranchInfo | null;
-}
-
-const BranchSupportSection = ({ branchInfo }: BranchSupportSectionProps) => {
+const BranchSupportSection = () => {
+  const { branchInfo } = useOutletContext<{ branchInfo: BranchInfo | null }>();
   const [view, setView] = useState<"overview" | "agents" | "agent-detail" | "tickets" | "performance">("overview");
   const [supportAgents, setSupportAgents] = useState<SupportAgent[]>([]);
   const [tickets, setTickets] = useState<Ticket[]>([]);

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import {
   BarChart3,
   TrendingUp,
@@ -33,13 +34,10 @@ interface BranchInfo {
   name: string;
 }
 
-interface BranchPerformanceDashboardProps {
-  branchInfo: BranchInfo | null;
-}
-
 const COLORS = ["hsl(var(--primary))", "hsl(var(--success))", "hsl(var(--warning))", "hsl(var(--info))"];
 
-const BranchPerformanceDashboard = ({ branchInfo }: BranchPerformanceDashboardProps) => {
+const BranchPerformanceDashboard = () => {
+  const { branchInfo } = useOutletContext<{ branchInfo: BranchInfo | null }>();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalStudents: 0,

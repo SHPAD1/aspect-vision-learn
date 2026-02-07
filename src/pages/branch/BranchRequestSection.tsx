@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import {
   FileText,
   Clock,
@@ -48,10 +49,6 @@ interface Request {
   requester_department?: string;
 }
 
-interface BranchRequestSectionProps {
-  branchInfo: BranchInfo | null;
-}
-
 const statusColors: Record<string, string> = {
   pending: "bg-warning/10 text-warning",
   branch_approved: "bg-info/10 text-info",
@@ -59,7 +56,8 @@ const statusColors: Record<string, string> = {
   rejected: "bg-destructive/10 text-destructive",
 };
 
-const BranchRequestSection = ({ branchInfo }: BranchRequestSectionProps) => {
+const BranchRequestSection = () => {
+  const { branchInfo } = useOutletContext<{ branchInfo: BranchInfo | null }>();
   const { user } = useAuth();
   const { toast } = useToast();
   const [requests, setRequests] = useState<Request[]>([]);

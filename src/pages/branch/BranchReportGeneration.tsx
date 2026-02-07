@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import {
   FileText,
   Download,
@@ -42,11 +43,8 @@ interface BranchInfo {
   code: string;
 }
 
-interface BranchReportGenerationProps {
-  branchInfo: BranchInfo | null;
-}
-
-const BranchReportGeneration = ({ branchInfo }: BranchReportGenerationProps) => {
+const BranchReportGeneration = () => {
+  const { branchInfo } = useOutletContext<{ branchInfo: BranchInfo | null }>();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);

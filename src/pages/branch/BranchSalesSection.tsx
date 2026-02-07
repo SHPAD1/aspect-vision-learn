@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import {
   Users,
   Phone,
@@ -57,11 +58,8 @@ interface Lead {
   assigned_to: string | null;
 }
 
-interface BranchSalesSectionProps {
-  branchInfo: BranchInfo | null;
-}
-
-const BranchSalesSection = ({ branchInfo }: BranchSalesSectionProps) => {
+const BranchSalesSection = () => {
+  const { branchInfo } = useOutletContext<{ branchInfo: BranchInfo | null }>();
   const [view, setView] = useState<"overview" | "agents" | "agent-detail" | "leads" | "followups" | "kpi">("overview");
   const [salesAgents, setSalesAgents] = useState<SalesAgent[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
