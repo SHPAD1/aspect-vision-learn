@@ -135,7 +135,7 @@ export default function BlogPost() {
           {/* Content */}
           <div 
             className="prose prose-lg max-w-none prose-headings:font-heading prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-primary prose-strong:text-foreground"
-            dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br/>') }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content.replace(/\n/g, '<br/>')) }}
           />
         </article>
       </main>
