@@ -865,7 +865,7 @@ const AdminUsers = () => {
 
       {/* Edit User Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
           </DialogHeader>
@@ -930,6 +930,60 @@ const AdminUsers = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Branch Selection - for employee roles and students */}
+            {(employeeRoles.includes(formData.role) || formData.role === "student") && (
+              <div>
+                <Label htmlFor="edit-branch">
+                  <Building className="w-3 h-3 inline mr-1" />
+                  Branch {employeeRoles.includes(formData.role) ? "*" : "(Optional)"}
+                </Label>
+                <Select
+                  value={formData.branch_id}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, branch_id: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select branch" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {branches.map((branch) => (
+                      <SelectItem key={branch.id} value={branch.id}>
+                        {branch.name} ({branch.city})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Department - only for employee roles */}
+            {employeeRoles.includes(formData.role) && (
+              <div>
+                <Label htmlFor="edit-department">
+                  <Briefcase className="w-3 h-3 inline mr-1" />
+                  Department
+                </Label>
+                <Select
+                  value={formData.department}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, department: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {departments.map((dept) => (
+                      <SelectItem key={dept.value} value={dept.value}>
+                        {dept.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button
