@@ -85,6 +85,8 @@ const departments = [
   { value: "teaching", label: "Teaching" },
   { value: "management", label: "Management" },
   { value: "operations", label: "Operations" },
+  { value: "hr", label: "Human Resources" },
+  { value: "accounts", label: "Accounts" },
 ];
 
 // Roles that require branch/employee mapping
