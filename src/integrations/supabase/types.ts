@@ -175,6 +175,47 @@ export type Database = {
           },
         ]
       }
+      branch_permissions: {
+        Row: {
+          branch_id: string
+          can_create_ids: boolean | null
+          can_manage_students: boolean | null
+          can_view_reports: boolean | null
+          created_at: string
+          department: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          branch_id: string
+          can_create_ids?: boolean | null
+          can_manage_students?: boolean | null
+          can_view_reports?: boolean | null
+          created_at?: string
+          department: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          branch_id?: string
+          can_create_ids?: boolean | null
+          can_manage_students?: boolean | null
+          can_view_reports?: boolean | null
+          created_at?: string
+          department?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "branch_permissions_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       branches: {
         Row: {
           address: string | null
