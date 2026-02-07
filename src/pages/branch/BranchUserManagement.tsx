@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
 import {
   Users,
   UserPlus,
@@ -70,10 +71,6 @@ interface Employee {
   role?: string;
 }
 
-interface BranchUserManagementProps {
-  branchInfo: BranchInfo | null;
-}
-
 const departmentColors: Record<string, string> = {
   sales: "bg-success/10 text-success",
   support: "bg-primary/10 text-primary",
@@ -82,7 +79,8 @@ const departmentColors: Record<string, string> = {
   operations: "bg-accent/10 text-accent-foreground",
 };
 
-const BranchUserManagement = ({ branchInfo }: BranchUserManagementProps) => {
+const BranchUserManagement = () => {
+  const { branchInfo } = useOutletContext<{ branchInfo: BranchInfo | null }>();
   const { toast } = useToast();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
