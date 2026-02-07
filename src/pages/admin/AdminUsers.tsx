@@ -320,6 +320,17 @@ const AdminUsers = () => {
 
   const handleUpdateUser = async () => {
     if (!selectedUser) return;
+    
+    // Validate branch for employee roles
+    if (employeeRoles.includes(formData.role) && !formData.branch_id) {
+      toast({
+        title: "Validation Error",
+        description: "Branch selection is required for this role",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setFormLoading(true);
 
     try {
@@ -347,7 +358,64 @@ const AdminUsers = () => {
 
       if (roleError) throw roleError;
 
-      toast({ title: "Success", description: "User updated successfully" });
+      // Handle employee/student branch mapping
+      if (employeeRoles.includes(formData.role)) {
+        // Check if employee record exists
+        const { data: existingEmployee } = await supabase
+          .from("employees")
+          .select("id")
+          .eq("user_id", selectedUser.user_id)
+          .maybeSingle();
+
+        if (existingEmployee) {
+          // Update existing employee
+          await supabase
+            .from("employees")
+            .update({
+              branch_id: formData.branch_id,
+              department: formData.department || formData.role,
+            })
+            .eq("user_id", selectedUser.user_id);
+        } else {
+          // Create new employee record
+          const employeeId = `EMP-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
+          await supabase
+            .from("employees")
+            .insert({
+              user_id: selectedUser.user_id,
+              branch_id: formData.branch_id,
+              department: formData.department || formData.role,
+              employee_id: employeeId,
+            });
+        }
+      } else if (formData.role === "student" && formData.branch_id) {
+        // Check if student record exists
+        const { data: existingStudent } = await supabase
+          .from("students")
+          .select("id")
+          .eq("user_id", selectedUser.user_id)
+          .maybeSingle();
+
+        if (existingStudent) {
+          // Update existing student
+          await supabase
+            .from("students")
+            .update({ branch_id: formData.branch_id })
+            .eq("user_id", selectedUser.user_id);
+        } else {
+          // Create new student record
+          const studentId = `STU-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
+          await supabase
+            .from("students")
+            .insert({
+              user_id: selectedUser.user_id,
+              branch_id: formData.branch_id,
+              student_id: studentId,
+            });
+        }
+      }
+
+      toast({ title: "Success", description: "User updated successfully with branch mapping" });
       setIsEditDialogOpen(false);
       fetchUsers();
     } catch (error: any) {
