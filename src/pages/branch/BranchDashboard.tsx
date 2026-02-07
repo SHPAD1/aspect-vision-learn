@@ -66,6 +66,7 @@ const managementItems = [
   { icon: CreditCard, label: "Financial", href: "/branch/payments" },
   { icon: UserCog, label: "User Management", href: "/branch/users" },
   { icon: ClipboardCheck, label: "Requests", href: "/branch/requests" },
+  { icon: Settings, label: "Settings", href: "/branch/settings" },
 ];
 
 const reportsItems = [
