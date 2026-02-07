@@ -163,20 +163,41 @@ const AdminUsers = () => {
 
       if (rolesError) throw rolesError;
 
-      // Map roles to users
-      const usersWithRoles: UserWithRoles[] = (profiles || []).map((profile) => ({
-        id: profile.id,
-        user_id: profile.user_id,
-        full_name: profile.full_name,
-        email: profile.email,
-        phone: profile.phone,
-        city: profile.city,
-        roles: roles
-          ?.filter((r) => r.user_id === profile.user_id)
-          .map((r) => r.role) || [],
-        created_at: profile.created_at,
-        is_blocked: false, // We'll track this in profile or separate table if needed
-      }));
+      // Fetch all employees with branch info
+      const { data: employees, error: employeesError } = await supabase
+        .from("employees")
+        .select("user_id, branch_id, department");
+
+      if (employeesError) console.error("Error fetching employees:", employeesError);
+
+      // Fetch all students with branch info
+      const { data: students, error: studentsError } = await supabase
+        .from("students")
+        .select("user_id, branch_id");
+
+      if (studentsError) console.error("Error fetching students:", studentsError);
+
+      // Map roles to users with branch info
+      const usersWithRoles: UserWithRoles[] = (profiles || []).map((profile) => {
+        const employee = employees?.find((e) => e.user_id === profile.user_id);
+        const student = students?.find((s) => s.user_id === profile.user_id);
+        
+        return {
+          id: profile.id,
+          user_id: profile.user_id,
+          full_name: profile.full_name,
+          email: profile.email,
+          phone: profile.phone,
+          city: profile.city,
+          roles: roles
+            ?.filter((r) => r.user_id === profile.user_id)
+            .map((r) => r.role) || [],
+          created_at: profile.created_at,
+          is_blocked: false,
+          branch_id: employee?.branch_id || student?.branch_id || null,
+          department: employee?.department || null,
+        };
+      });
 
       setUsers(usersWithRoles);
     } catch (error) {
