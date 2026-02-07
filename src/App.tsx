@@ -179,10 +179,15 @@ const App = () => (
               <Route index element={<BranchOverview />} />
               <Route path="profile" element={<BranchProfile />} />
               <Route path="batches" element={<BranchBatches />} />
-              <Route path="students" element={<BranchStudents />} />
-              <Route path="employees" element={<BranchEmployees />} />
+              <Route path="sales" element={<BranchSalesSection />} />
+              <Route path="support" element={<BranchSupportSection />} />
+              <Route path="teachers" element={<BranchTeacherSection />} />
+              <Route path="students" element={<BranchStudentSection />} />
               <Route path="payments" element={<BranchPayments />} />
-              <Route path="reports" element={<BranchReports />} />
+              <Route path="users" element={<BranchUserManagement />} />
+              <Route path="requests" element={<BranchRequestSection />} />
+              <Route path="reports" element={<BranchReportGeneration />} />
+              <Route path="performance" element={<BranchPerformanceDashboard />} />
               <Route path="analytics" element={<BranchAnalytics />} />
               <Route path="blog" element={<BranchBlog />} />
             </Route>
