@@ -84,6 +84,14 @@ import BranchPayments from "./pages/branch/BranchPayments";
 import BranchReports from "./pages/branch/BranchReports";
 import BranchAnalytics from "./pages/branch/BranchAnalytics";
 import BranchBlog from "./pages/branch/BranchBlog";
+import BranchSalesSection from "./pages/branch/BranchSalesSection";
+import BranchSupportSection from "./pages/branch/BranchSupportSection";
+import BranchTeacherSection from "./pages/branch/BranchTeacherSection";
+import BranchStudentSection from "./pages/branch/BranchStudentSection";
+import BranchUserManagement from "./pages/branch/BranchUserManagement";
+import BranchRequestSection from "./pages/branch/BranchRequestSection";
+import BranchReportGeneration from "./pages/branch/BranchReportGeneration";
+import BranchPerformanceDashboard from "./pages/branch/BranchPerformanceDashboard";
 
 const queryClient = new QueryClient();
 
