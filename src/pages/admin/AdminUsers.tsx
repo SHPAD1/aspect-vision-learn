@@ -551,7 +551,7 @@ const AdminUsers = () => {
               <TableHead>Name</TableHead>
               <TableHead>Contact</TableHead>
               <TableHead>Roles</TableHead>
-              <TableHead>City</TableHead>
+              <TableHead>Branch</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -564,110 +564,118 @@ const AdminUsers = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredUsers.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        <span className="text-sm font-medium text-primary">
-                          {user.full_name.charAt(0).toUpperCase()}
-                        </span>
+              filteredUsers.map((user) => {
+                const userBranch = branches.find((b) => b.id === user.branch_id);
+                return (
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <span className="text-sm font-medium text-primary">
+                            {user.full_name.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-medium">{user.full_name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {user.email}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium">{user.full_name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {user.email}
-                        </p>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        {user.phone ? (
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <Phone className="w-3 h-3" />
+                            {user.phone}
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm">
-                      {user.phone ? (
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Phone className="w-3 h-3" />
-                          {user.phone}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {user.roles.length > 0 ? (
+                          user.roles.map((role) => (
+                            <Badge
+                              key={role}
+                              variant="secondary"
+                              className={roleColors[role]}
+                            >
+                              {role.replace("_", " ")}
+                            </Badge>
+                          ))
+                        ) : (
+                          <Badge variant="secondary" className="bg-destructive/10 text-destructive">
+                            Blocked
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {userBranch ? (
+                        <div className="flex items-center gap-1">
+                          <Building className="w-3 h-3 text-muted-foreground" />
+                          <span className="text-sm">{userBranch.name}</span>
                         </div>
                       ) : (
                         <span className="text-muted-foreground">-</span>
                       )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {user.roles.length > 0 ? (
-                        user.roles.map((role) => (
-                          <Badge
-                            key={role}
-                            variant="secondary"
-                            className={roleColors[role]}
-                          >
-                            {role.replace("_", " ")}
-                          </Badge>
-                        ))
-                      ) : (
-                        <Badge variant="secondary" className="bg-destructive/10 text-destructive">
-                          Blocked
-                        </Badge>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-muted-foreground">
-                      {user.city || "-"}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="secondary"
-                      className={
-                        user.roles.length > 0
-                          ? "bg-success/10 text-success"
-                          : "bg-destructive/10 text-destructive"
-                      }
-                    >
-                      {user.roles.length > 0 ? "Active" : "Blocked"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEditUser(user)}
-                        title="Edit User"
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="secondary"
+                        className={
+                          user.roles.length > 0
+                            ? "bg-success/10 text-success"
+                            : "bg-destructive/10 text-destructive"
+                        }
                       >
-                        <Edit2 className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className={user.roles.length > 0 ? "text-warning hover:text-warning" : "text-success hover:text-success"}
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setIsBlockDialogOpen(true);
-                        }}
-                        title={user.roles.length > 0 ? "Block User" : "User is blocked"}
-                        disabled={user.roles.length === 0}
-                      >
-                        <Ban className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive hover:text-destructive"
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setIsDeleteDialogOpen(true);
-                        }}
-                        title="Delete User"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
+                        {user.roles.length > 0 ? "Active" : "Blocked"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEditUser(user)}
+                          title="Edit User"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className={user.roles.length > 0 ? "text-warning hover:text-warning" : "text-success hover:text-success"}
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setIsBlockDialogOpen(true);
+                          }}
+                          title={user.roles.length > 0 ? "Block User" : "User is blocked"}
+                          disabled={user.roles.length === 0}
+                        >
+                          <Ban className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-destructive hover:text-destructive"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setIsDeleteDialogOpen(true);
+                          }}
+                          title="Delete User"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
         </Table>
