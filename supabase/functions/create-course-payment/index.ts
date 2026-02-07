@@ -26,12 +26,18 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    // Get request body
-    const { batch_id, course_name, amount } = await req.json();
-    logStep("Request body received", { batch_id, course_name, amount });
+    // Get request body - only batch_id is required, amount will be fetched from database
+    const { batch_id } = await req.json();
+    logStep("Request body received", { batch_id });
 
-    if (!batch_id || !amount) {
-      throw new Error("Missing required fields: batch_id and amount");
+    if (!batch_id) {
+      throw new Error("Missing required field: batch_id");
+    }
+
+    // Validate batch_id format (UUID)
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(batch_id)) {
+      throw new Error("Invalid batch_id format");
     }
 
     // Retrieve authenticated user
@@ -49,6 +55,26 @@ serve(async (req) => {
     }
     logStep("User authenticated", { userId: user.id, email: user.email });
 
+    // Fetch batch details from database to get the correct fees
+    const { data: batchData, error: batchError } = await supabaseClient
+      .from("batches")
+      .select("id, name, fees, course_id, is_active")
+      .eq("id", batch_id)
+      .eq("is_active", true)
+      .single();
+
+    if (batchError || !batchData) {
+      logStep("Batch fetch error", { error: batchError });
+      throw new Error("Invalid or inactive batch");
+    }
+
+    // Validate amount is positive
+    const amount = batchData.fees;
+    if (!amount || amount <= 0) {
+      throw new Error("Invalid batch fee amount");
+    }
+    logStep("Batch validated", { batchId: batch_id, fees: amount, courseName: batchData.name });
+
     // Initialize Stripe
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
@@ -59,6 +85,9 @@ serve(async (req) => {
       apiVersion: "2025-08-27.basil",
     });
     logStep("Stripe initialized");
+    
+    // Use batch name from database
+    const course_name = batchData.name;
 
     // Check if a Stripe customer record exists for this user
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
