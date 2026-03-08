@@ -4,11 +4,10 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { IndianRupee, ArrowLeft, CreditCard, Wallet, Building2, CheckCircle, Loader2 } from "lucide-react";
+import { IndianRupee, ArrowLeft, CreditCard, CheckCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 
 interface BatchInfo {
@@ -16,6 +15,12 @@ interface BatchInfo {
   name: string;
   fees: number;
   course: { name: string; discount_percent: number | null };
+}
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
 }
 
 export default function PaymentPage() {
@@ -27,10 +32,11 @@ export default function PaymentPage() {
   const [processing, setProcessing] = useState(false);
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState("online");
+  const [razorpayLoaded, setRazorpayLoaded] = useState(false);
 
   useEffect(() => {
     if (batchId) fetchBatch();
+    loadRazorpayScript();
   }, [batchId]);
 
   useEffect(() => {
@@ -39,6 +45,18 @@ export default function PaymentPage() {
       navigate("/auth");
     }
   }, [authLoading, user, navigate]);
+
+  const loadRazorpayScript = () => {
+    if (window.Razorpay) {
+      setRazorpayLoaded(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => setRazorpayLoaded(true);
+    script.onerror = () => toast.error("Failed to load payment gateway");
+    document.body.appendChild(script);
+  };
 
   const fetchBatch = async () => {
     try {
@@ -51,10 +69,7 @@ export default function PaymentPage() {
 
       if (error) throw error;
       if (data) {
-        setBatch({
-          ...data,
-          course: data.courses as any,
-        });
+        setBatch({ ...data, course: data.courses as any });
       }
     } catch (error) {
       console.error("Error fetching batch:", error);
@@ -63,13 +78,8 @@ export default function PaymentPage() {
     }
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
+  const formatCurrency = (amount: number) =>
+    new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(amount);
 
   const getDiscountedPrice = (price: number, discount: number | null) => {
     if (!discount || discount <= 0) return price;
@@ -95,21 +105,19 @@ export default function PaymentPage() {
         return;
       }
 
-      // Check if coupon is still valid
       if (data.valid_until && new Date(data.valid_until) < new Date()) {
         toast.error("This coupon has expired");
         return;
       }
 
-      // Check usage limit
-      if (data.max_uses && data.used_count >= data.max_uses) {
+      if (data.max_uses && (data.used_count ?? 0) >= data.max_uses) {
         toast.error("This coupon has reached its usage limit");
         return;
       }
 
       setAppliedCoupon({ code: data.code, discount: data.discount_percent });
       toast.success(`Coupon applied! ${data.discount_percent}% discount added`);
-    } catch (error) {
+    } catch {
       toast.error("Failed to apply coupon");
     }
   };
@@ -120,30 +128,69 @@ export default function PaymentPage() {
   };
 
   const handlePayment = async () => {
-    if (!user || !batch) return;
+    if (!user || !batch || !razorpayLoaded) return;
 
     setProcessing(true);
     try {
-      // Calculate final amount
-      let amount = getDiscountedPrice(batch.fees, batch.course.discount_percent);
-      if (appliedCoupon) {
-        amount = amount - (amount * appliedCoupon.discount) / 100;
+      // Create order via edge function
+      const { data: orderData, error: orderErr } = await supabase.functions.invoke("razorpay-payment", {
+        body: {
+          action: "create_order",
+          batch_id: batch.id,
+          coupon_code: appliedCoupon?.code || null,
+        },
+      });
+
+      if (orderErr || orderData?.error) {
+        throw new Error(orderData?.error || orderErr?.message || "Failed to create order");
       }
 
-      // For demo purposes, we'll create a pending payment record
-      // In production, integrate with payment gateway like Razorpay
-      
-      toast.success("Redirecting to payment gateway...");
-      
-      // Simulate payment gateway redirect
-      setTimeout(() => {
-        toast.success("Payment successful! You are now enrolled.");
-        navigate("/dashboard/courses");
-      }, 2000);
-      
-    } catch (error) {
-      toast.error("Payment failed. Please try again.");
-    } finally {
+      // Open Razorpay checkout
+      const options = {
+        key: orderData.key_id,
+        amount: orderData.amount * 100,
+        currency: orderData.currency,
+        name: "Aspect Vision",
+        description: `${orderData.course_name} - ${orderData.batch_name}`,
+        order_id: orderData.order_id,
+        prefill: orderData.prefill,
+        theme: { color: "#6366f1" },
+        handler: async (response: any) => {
+          // Verify payment
+          try {
+            const { data: verifyData, error: verifyErr } = await supabase.functions.invoke("razorpay-payment", {
+              body: {
+                action: "verify_payment",
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                batch_id: batch.id,
+                coupon_code: appliedCoupon?.code || null,
+              },
+            });
+
+            if (verifyErr || verifyData?.error) {
+              throw new Error(verifyData?.error || "Verification failed");
+            }
+
+            toast.success("Payment successful! You are now enrolled.");
+            navigate("/dashboard/courses?payment=success");
+          } catch (err: any) {
+            toast.error(err.message || "Payment verification failed");
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setProcessing(false);
+            toast.info("Payment cancelled");
+          },
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    } catch (error: any) {
+      toast.error(error.message || "Payment failed. Please try again.");
       setProcessing(false);
     }
   };
@@ -193,7 +240,6 @@ export default function PaymentPage() {
       <Navbar />
       <main className="pt-24 pb-16">
         <div className="container mx-auto px-4 lg:px-8 max-w-4xl">
-          {/* Back Button */}
           <Link to={`/batch/${batchId}`} className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Batch Details
@@ -237,47 +283,17 @@ export default function PaymentPage() {
                   )}
                 </div>
 
-                {/* Payment Method */}
-                <div className="space-y-4">
-                  <Label>Select Payment Method</Label>
-                  <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="space-y-3">
-                    <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary/50 cursor-pointer">
-                      <RadioGroupItem value="online" id="online" />
-                      <label htmlFor="online" className="flex-1 cursor-pointer">
-                        <div className="flex items-center gap-3">
-                          <CreditCard className="w-5 h-5 text-primary" />
-                          <div>
-                            <p className="font-medium text-foreground">Online Payment</p>
-                            <p className="text-sm text-muted-foreground">Credit/Debit Card, UPI, Net Banking</p>
-                          </div>
-                        </div>
-                      </label>
+                {/* Payment Method Info */}
+                <div className="p-4 rounded-lg border border-border bg-muted/30">
+                  <div className="flex items-center gap-3">
+                    <CreditCard className="w-6 h-6 text-primary" />
+                    <div>
+                      <p className="font-medium text-foreground">Razorpay Secure Payment</p>
+                      <p className="text-sm text-muted-foreground">
+                        Credit/Debit Card, UPI, Net Banking, Wallets
+                      </p>
                     </div>
-                    <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary/50 cursor-pointer">
-                      <RadioGroupItem value="wallet" id="wallet" />
-                      <label htmlFor="wallet" className="flex-1 cursor-pointer">
-                        <div className="flex items-center gap-3">
-                          <Wallet className="w-5 h-5 text-primary" />
-                          <div>
-                            <p className="font-medium text-foreground">UPI / Wallet</p>
-                            <p className="text-sm text-muted-foreground">Google Pay, PhonePe, Paytm</p>
-                          </div>
-                        </div>
-                      </label>
-                    </div>
-                    <div className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:border-primary/50 cursor-pointer">
-                      <RadioGroupItem value="emi" id="emi" />
-                      <label htmlFor="emi" className="flex-1 cursor-pointer">
-                        <div className="flex items-center gap-3">
-                          <Building2 className="w-5 h-5 text-primary" />
-                          <div>
-                            <p className="font-medium text-foreground">EMI Options</p>
-                            <p className="text-sm text-muted-foreground">Easy monthly installments</p>
-                          </div>
-                        </div>
-                      </label>
-                    </div>
-                  </RadioGroup>
+                  </div>
                 </div>
               </div>
             </div>
@@ -286,7 +302,7 @@ export default function PaymentPage() {
             <div className="lg:col-span-2">
               <div className="sticky top-24 bg-card rounded-xl border border-border p-6 space-y-4">
                 <h2 className="font-heading text-lg font-semibold text-foreground">Order Summary</h2>
-                
+
                 <div className="p-4 rounded-lg bg-muted/50">
                   <p className="text-sm text-muted-foreground">{batch.course.name}</p>
                   <p className="font-medium text-foreground">{batch.name}</p>
@@ -297,14 +313,14 @@ export default function PaymentPage() {
                     <span className="text-muted-foreground">Course Fee</span>
                     <span className="text-foreground">{formatCurrency(basePrice)}</span>
                   </div>
-                  
+
                   {courseDiscount > 0 && (
                     <div className="flex justify-between text-sm">
                       <span className="text-green-600">Course Discount ({courseDiscount}%)</span>
                       <span className="text-green-600">-{formatCurrency(basePrice - priceAfterCourseDiscount)}</span>
                     </div>
                   )}
-                  
+
                   {appliedCoupon && (
                     <div className="flex justify-between text-sm">
                       <span className="text-green-600">Coupon ({appliedCoupon.discount}%)</span>
@@ -322,12 +338,7 @@ export default function PaymentPage() {
                   </div>
                 </div>
 
-                <Button 
-                  className="w-full" 
-                  size="lg"
-                  onClick={handlePayment}
-                  disabled={processing}
-                >
+                <Button className="w-full" size="lg" onClick={handlePayment} disabled={processing || !razorpayLoaded}>
                   {processing ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -342,7 +353,7 @@ export default function PaymentPage() {
                 </Button>
 
                 <p className="text-xs text-center text-muted-foreground">
-                  By proceeding, you agree to our Terms of Service and Privacy Policy
+                  Secured by Razorpay. By proceeding, you agree to our Terms of Service.
                 </p>
               </div>
             </div>
