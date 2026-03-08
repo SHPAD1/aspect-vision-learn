@@ -154,6 +154,7 @@ const App = () => (
               <Route path="youtube" element={<AdminYoutube />} />
               <Route path="branches" element={<AdminBranches />} />
               <Route path="settings" element={<AdminSettings />} />
+              <Route path="branch-permissions" element={<AdminBranchPermissions />} />
             </Route>
             
             {/* Sales Dashboard */}
