@@ -385,7 +385,13 @@ const BranchStudentSection = () => {
               </div>
 
               <div className="flex flex-col gap-2">
-                <Button variant="outline" size="sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={!canCreateIds}
+                  onClick={() => setView("idcard")}
+                  title={!canCreateIds ? "ID creation permission not enabled for this branch" : ""}
+                >
                   <IdCard className="w-4 h-4 mr-2" /> Generate ID Card
                 </Button>
                 <Button variant="outline" size="sm">
