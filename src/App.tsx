@@ -55,6 +55,7 @@ import AdminCoupons from "./pages/admin/AdminCoupons";
 import AdminNotices from "./pages/admin/AdminNotices";
 import AdminTeam from "./pages/admin/AdminTeam";
 import AdminBlog from "./pages/admin/AdminBlog";
+import AdminBranchPermissions from "./pages/admin/AdminBranchPermissions";
 // Sales pages
 import SalesDashboard from "./pages/sales/SalesDashboard";
 import SalesOverview from "./pages/sales/SalesOverview";
