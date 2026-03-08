@@ -19,6 +19,7 @@ import {
   Bell,
   UsersRound,
   Newspaper,
+  Shield,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -66,6 +67,7 @@ const managementItems = [
 const systemItems = [
   { icon: UserPlus, label: "User Management", href: "/admin/users" },
   { icon: Building2, label: "Branches", href: "/admin/branches" },
+  { icon: Shield, label: "Branch Permissions", href: "/admin/branch-permissions" },
   { icon: Settings, label: "Settings", href: "/admin/settings" },
 ];
 
