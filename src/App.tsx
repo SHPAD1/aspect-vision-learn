@@ -56,6 +56,7 @@ import AdminNotices from "./pages/admin/AdminNotices";
 import AdminTeam from "./pages/admin/AdminTeam";
 import AdminBlog from "./pages/admin/AdminBlog";
 import AdminBranchPermissions from "./pages/admin/AdminBranchPermissions";
+import AdminPaymentSettings from "./pages/admin/AdminPaymentSettings";
 // Sales pages
 import SalesDashboard from "./pages/sales/SalesDashboard";
 import SalesOverview from "./pages/sales/SalesOverview";
@@ -155,6 +156,7 @@ const App = () => (
               <Route path="branches" element={<AdminBranches />} />
               <Route path="settings" element={<AdminSettings />} />
               <Route path="branch-permissions" element={<AdminBranchPermissions />} />
+              <Route path="payment-settings" element={<AdminPaymentSettings />} />
             </Route>
             
             {/* Sales Dashboard */}
