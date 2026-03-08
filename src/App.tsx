@@ -158,6 +158,7 @@ const App = () => (
               <Route path="settings" element={<AdminSettings />} />
               <Route path="branch-permissions" element={<AdminBranchPermissions />} />
               <Route path="payment-settings" element={<AdminPaymentSettings />} />
+              <Route path="email-settings" element={<AdminEmailSettings />} />
             </Route>
             
             {/* Sales Dashboard */}
