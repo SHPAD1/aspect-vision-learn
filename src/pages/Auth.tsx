@@ -23,13 +23,13 @@ const roleRoutes: Record<AppRole, string> = {
   student: "/dashboard",
 };
 
-const getRedirectRoute = (userRoles: AppRole[]): string => {
+const getRedirectRoute = (userRoles: AppRole[]): string | null => {
   for (const role of rolePriority) {
     if (userRoles.includes(role)) {
       return roleRoutes[role];
     }
   }
-  return "/dashboard";
+  return null;
 };
 
 const loginSchema = z.object({
