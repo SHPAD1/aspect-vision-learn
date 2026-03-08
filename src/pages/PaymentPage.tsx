@@ -175,6 +175,13 @@ export default function PaymentPage() {
             }
 
             toast.success("Payment successful! You are now enrolled.");
+
+            // Send confirmation emails (non-blocking)
+            const userEmail = user?.email || "";
+            const userName = user?.user_metadata?.full_name || "Student";
+            sendPaymentEmail(userEmail, userName, orderData.amount / 100, response.razorpay_payment_id, batch.name).catch(() => {});
+            sendEnrollmentEmail(userEmail, userName, batch.name, batch.course.name, batch.fees).catch(() => {});
+
             navigate("/dashboard/courses?payment=success");
           } catch (err: any) {
             toast.error(err.message || "Payment verification failed");
