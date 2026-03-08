@@ -536,6 +536,122 @@ const BranchStudentSection = () => {
     );
   };
 
+  const renderIDCard = () => {
+    if (!selectedStudent) return null;
+
+    return (
+      <div className="space-y-6">
+        <Button variant="ghost" onClick={() => setView("detail")} className="gap-2">
+          <ArrowLeft className="w-4 h-4" /> Back to Student Details
+        </Button>
+
+        <div>
+          <h2 className="font-heading text-2xl font-bold text-foreground flex items-center gap-2">
+            <IdCard className="w-6 h-6 text-primary" />
+            Student ID Card - {selectedStudent.profile?.full_name}
+          </h2>
+          <p className="text-muted-foreground">Generate and download student ID card</p>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
+          {/* Front */}
+          <div className="w-full max-w-md">
+            <h3 className="font-heading text-lg font-semibold text-foreground mb-4">Front</h3>
+            <div
+              ref={cardRef}
+              className="relative bg-gradient-to-br from-primary via-primary to-primary/80 rounded-2xl p-6 text-primary-foreground shadow-2xl aspect-[1.6/1] overflow-hidden"
+            >
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+              </div>
+              <div className="relative z-10 h-full flex flex-col justify-between">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+                      <IdCard className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="font-heading text-lg font-bold">Aspect Vision</p>
+                      <p className="text-xs opacity-80">Student ID Card</p>
+                    </div>
+                  </div>
+                  <div className="w-16 h-16 rounded-xl bg-white flex items-center justify-center">
+                    <QrCode className="w-12 h-12 text-primary" />
+                  </div>
+                </div>
+                <div className="flex items-end gap-4">
+                  <div className="w-20 h-24 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center overflow-hidden">
+                    {selectedStudent.profile?.avatar_url ? (
+                      <img src={selectedStudent.profile.avatar_url} alt="Student" className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="w-10 h-10" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-heading text-xl font-bold truncate">{selectedStudent.profile?.full_name}</p>
+                    <p className="text-sm opacity-80 mb-1">ID: {selectedStudent.student_id}</p>
+                    <div className="flex items-center gap-4 text-xs opacity-80">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {format(new Date(selectedStudent.enrollment_date), "MMM yyyy")}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Building2 className="w-3 h-3" />
+                        {branchInfo?.name}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Back */}
+          <div className="w-full max-w-md">
+            <h3 className="font-heading text-lg font-semibold text-foreground mb-4">Back</h3>
+            <div className="relative bg-muted rounded-2xl p-6 shadow-lg aspect-[1.6/1] border border-border">
+              <div className="h-full flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Email:</span>
+                    <span className="text-sm font-medium text-foreground">{selectedStudent.profile?.email}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Phone:</span>
+                    <span className="text-sm font-medium text-foreground">{selectedStudent.profile?.phone || "Not provided"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Branch:</span>
+                    <span className="text-sm font-medium text-foreground">{branchInfo?.name || "Online"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Valid Till:</span>
+                    <span className="text-sm font-medium text-foreground">Dec 2026</span>
+                  </div>
+                </div>
+                <div className="pt-4 border-t border-border">
+                  <p className="text-xs text-muted-foreground text-center">
+                    This card is the property of Aspect Vision. If found, please return to the nearest branch.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-4">
+          <Button onClick={() => alert("Download functionality would generate a PNG/PDF of the ID card")}>
+            <Download className="w-4 h-4 mr-2" /> Download as PNG
+          </Button>
+          <Button variant="outline" onClick={() => alert("Download functionality would generate a PNG/PDF of the ID card")}>
+            <Download className="w-4 h-4 mr-2" /> Download as PDF
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
   if (loading) {
     return <div className="flex items-center justify-center py-12">Loading...</div>;
   }
@@ -544,6 +660,7 @@ const BranchStudentSection = () => {
     <div>
       {view === "list" && renderStudentList()}
       {view === "detail" && renderStudentDetail()}
+      {view === "idcard" && renderIDCard()}
     </div>
   );
 };
