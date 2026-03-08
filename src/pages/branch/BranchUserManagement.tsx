@@ -4,7 +4,6 @@ import {
   Users,
   UserPlus,
   Edit,
-  Trash2,
   Shield,
   Search,
   Loader2,
@@ -36,24 +35,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
 
 interface BranchInfo {
   id: string;
   name: string;
 }
+
+type BranchCreatableRole = "teacher" | "sales" | "support";
 
 interface Employee {
   id: string;
@@ -77,6 +67,30 @@ const departmentColors: Record<string, string> = {
   teaching: "bg-info/10 text-info",
   management: "bg-warning/10 text-warning",
   operations: "bg-accent/10 text-accent-foreground",
+  hr: "bg-muted text-muted-foreground",
+  accounts: "bg-secondary text-secondary-foreground",
+};
+
+const createRoleOptions: Array<{ value: BranchCreatableRole; label: string }> = [
+  { value: "teacher", label: "Teacher" },
+  { value: "sales", label: "Sales" },
+  { value: "support", label: "Support" },
+];
+
+const departmentOptions = [
+  { value: "sales", label: "Sales" },
+  { value: "support", label: "Support" },
+  { value: "teaching", label: "Teaching" },
+  { value: "management", label: "Management" },
+  { value: "operations", label: "Operations" },
+  { value: "hr", label: "Human Resources" },
+  { value: "accounts", label: "Accounts" },
+];
+
+const defaultDepartmentByRole: Record<BranchCreatableRole, string> = {
+  teacher: "teaching",
+  sales: "sales",
+  support: "support",
 };
 
 const BranchUserManagement = () => {
@@ -87,10 +101,22 @@ const BranchUserManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
-  const [formData, setFormData] = useState({
+
+  const [addFormData, setAddFormData] = useState({
+    full_name: "",
+    email: "",
+    password: "",
+    phone: "",
+    city: "",
+    role: "support" as BranchCreatableRole,
+    department: "support",
+    designation: "",
+    salary: "",
+  });
+
+  const [editFormData, setEditFormData] = useState({
     department: "",
     designation: "",
   });
@@ -98,6 +124,20 @@ const BranchUserManagement = () => {
   useEffect(() => {
     fetchEmployees();
   }, [branchInfo]);
+
+  const resetAddForm = () => {
+    setAddFormData({
+      full_name: "",
+      email: "",
+      password: "",
+      phone: "",
+      city: "",
+      role: "support",
+      department: "support",
+      designation: "",
+      salary: "",
+    });
+  };
 
   const fetchEmployees = async () => {
     if (!branchInfo?.id) {
@@ -114,7 +154,7 @@ const BranchUserManagement = () => {
 
       if (employeesData && employeesData.length > 0) {
         const userIds = employeesData.map((e) => e.user_id);
-        
+
         const [{ data: profiles }, { data: roles }] = await Promise.all([
           supabase
             .from("profiles")
@@ -128,13 +168,13 @@ const BranchUserManagement = () => {
 
         const profileMap = new Map(profiles?.map((p) => [p.user_id, p]));
         const roleMap = new Map(roles?.map((r) => [r.user_id, r.role]));
-        
+
         const employeesWithDetails = employeesData.map((e) => ({
           ...e,
           profile: profileMap.get(e.user_id),
           role: roleMap.get(e.user_id),
         }));
-        
+
         setEmployees(employeesWithDetails);
       } else {
         setEmployees([]);
@@ -147,9 +187,77 @@ const BranchUserManagement = () => {
     }
   };
 
+  const handleAddUser = async () => {
+    if (!branchInfo?.id) {
+      toast({
+        title: "Error",
+        description: "Branch context not found",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!addFormData.full_name.trim() || !addFormData.email.trim() || !addFormData.password.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Name, email, and password are required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (addFormData.password.length < 6) {
+      toast({
+        title: "Validation Error",
+        description: "Password must be at least 6 characters",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setActionLoading(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("create-user", {
+        body: {
+          email: addFormData.email.trim(),
+          password: addFormData.password,
+          full_name: addFormData.full_name.trim(),
+          phone: addFormData.phone.trim() || null,
+          city: addFormData.city.trim() || null,
+          role: addFormData.role,
+          branch_id: branchInfo.id,
+          department: addFormData.department,
+          designation: addFormData.designation.trim() || null,
+          salary: addFormData.salary ? Number(addFormData.salary) : null,
+        },
+      });
+
+      if (error) throw new Error(error.message || "Failed to create user");
+      if (data?.error) throw new Error(data.error);
+
+      toast({
+        title: "Success",
+        description: `${addFormData.full_name} ka login ID ${branchInfo.name} branch ke under create ho gaya`,
+      });
+
+      setIsAddDialogOpen(false);
+      resetAddForm();
+      fetchEmployees();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create user",
+        variant: "destructive",
+      });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const handleEdit = (employee: Employee) => {
     setSelectedEmployee(employee);
-    setFormData({
+    setEditFormData({
       department: employee.department,
       designation: employee.designation || "",
     });
@@ -164,8 +272,8 @@ const BranchUserManagement = () => {
       const { error } = await supabase
         .from("employees")
         .update({
-          department: formData.department,
-          designation: formData.designation || null,
+          department: editFormData.department,
+          designation: editFormData.designation || null,
         })
         .eq("id", selectedEmployee.id);
 
@@ -215,7 +323,7 @@ const BranchUserManagement = () => {
     (e) =>
       e.employee_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       e.profile?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      e.department.toLowerCase().includes(searchQuery.toLowerCase())
+      e.department.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   if (loading) {
@@ -242,7 +350,6 @@ const BranchUserManagement = () => {
         </Button>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {["sales", "support", "teaching", "management"].map((dept) => (
           <Card key={dept}>
@@ -263,7 +370,6 @@ const BranchUserManagement = () => {
         ))}
       </div>
 
-      {/* Search */}
       <div className="relative max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
@@ -274,7 +380,6 @@ const BranchUserManagement = () => {
         />
       </div>
 
-      {/* Employees Table */}
       <Card>
         <CardHeader>
           <CardTitle>All Users ({filteredEmployees.length})</CardTitle>
@@ -339,8 +444,8 @@ const BranchUserManagement = () => {
                         <Button size="icon" variant="ghost" onClick={() => handleEdit(employee)}>
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button 
-                          size="sm" 
+                        <Button
+                          size="sm"
                           variant={employee.is_active ? "outline" : "default"}
                           onClick={() => handleToggleStatus(employee)}
                         >
@@ -356,28 +461,143 @@ const BranchUserManagement = () => {
         </CardContent>
       </Card>
 
-      {/* Add User Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add New User</DialogTitle>
+            <DialogTitle>Create Employee Login ID</DialogTitle>
           </DialogHeader>
-          <div className="py-4 text-center">
-            <UserPlus className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <p className="text-muted-foreground">
-              To add a new employee, please contact the main admin. 
-              New user creation requires admin-level permissions.
+
+          <div className="space-y-4 py-1">
+            <div>
+              <Label>Full Name</Label>
+              <Input
+                value={addFormData.full_name}
+                onChange={(e) => setAddFormData((prev) => ({ ...prev, full_name: e.target.value }))}
+                placeholder="Employee full name"
+              />
+            </div>
+
+            <div>
+              <Label>Email</Label>
+              <Input
+                type="email"
+                value={addFormData.email}
+                onChange={(e) => setAddFormData((prev) => ({ ...prev, email: e.target.value }))}
+                placeholder="employee@email.com"
+              />
+            </div>
+
+            <div>
+              <Label>Password</Label>
+              <Input
+                type="password"
+                value={addFormData.password}
+                onChange={(e) => setAddFormData((prev) => ({ ...prev, password: e.target.value }))}
+                placeholder="Minimum 6 characters"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label>Phone</Label>
+                <Input
+                  value={addFormData.phone}
+                  onChange={(e) => setAddFormData((prev) => ({ ...prev, phone: e.target.value }))}
+                  placeholder="Optional"
+                />
+              </div>
+              <div>
+                <Label>City</Label>
+                <Input
+                  value={addFormData.city}
+                  onChange={(e) => setAddFormData((prev) => ({ ...prev, city: e.target.value }))}
+                  placeholder="Optional"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label>Role</Label>
+                <Select
+                  value={addFormData.role}
+                  onValueChange={(value: BranchCreatableRole) =>
+                    setAddFormData((prev) => ({
+                      ...prev,
+                      role: value,
+                      department: defaultDepartmentByRole[value],
+                    }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {createRoleOptions.map((role) => (
+                      <SelectItem key={role.value} value={role.value}>
+                        {role.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Department</Label>
+                <Select
+                  value={addFormData.department}
+                  onValueChange={(value) => setAddFormData((prev) => ({ ...prev, department: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {departmentOptions.map((department) => (
+                      <SelectItem key={department.value} value={department.value}>
+                        {department.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label>Designation</Label>
+                <Input
+                  value={addFormData.designation}
+                  onChange={(e) => setAddFormData((prev) => ({ ...prev, designation: e.target.value }))}
+                  placeholder="e.g., Senior Executive"
+                />
+              </div>
+              <div>
+                <Label>Salary (Optional)</Label>
+                <Input
+                  type="number"
+                  value={addFormData.salary}
+                  onChange={(e) => setAddFormData((prev) => ({ ...prev, salary: e.target.value }))}
+                  placeholder="Monthly salary"
+                />
+              </div>
+            </div>
+
+            <p className="text-xs text-muted-foreground">
+              User automatically {branchInfo?.name} branch ke under create hoga.
             </p>
           </div>
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-              Close
+              Cancel
+            </Button>
+            <Button onClick={handleAddUser} disabled={actionLoading}>
+              {actionLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create ID"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -387,26 +607,26 @@ const BranchUserManagement = () => {
             <div>
               <Label>Department</Label>
               <Select
-                value={formData.department}
-                onValueChange={(value) => setFormData({ ...formData, department: value })}
+                value={editFormData.department}
+                onValueChange={(value) => setEditFormData((prev) => ({ ...prev, department: value }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select department" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="sales">Sales</SelectItem>
-                  <SelectItem value="support">Support</SelectItem>
-                  <SelectItem value="teaching">Teaching</SelectItem>
-                  <SelectItem value="management">Management</SelectItem>
-                  <SelectItem value="operations">Operations</SelectItem>
+                  {departmentOptions.map((department) => (
+                    <SelectItem key={department.value} value={department.value}>
+                      {department.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
               <Label>Designation</Label>
               <Input
-                value={formData.designation}
-                onChange={(e) => setFormData({ ...formData, designation: e.target.value })}
+                value={editFormData.designation}
+                onChange={(e) => setEditFormData((prev) => ({ ...prev, designation: e.target.value }))}
                 placeholder="e.g., Senior Executive"
               />
             </div>
