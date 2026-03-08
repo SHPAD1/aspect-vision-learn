@@ -96,6 +96,7 @@ import BranchRequestSection from "./pages/branch/BranchRequestSection";
 import BranchReportGeneration from "./pages/branch/BranchReportGeneration";
 import BranchPerformanceDashboard from "./pages/branch/BranchPerformanceDashboard";
 import BranchSettings from "./pages/branch/BranchSettings";
+import BranchNotices from "./pages/branch/BranchNotices";
 
 const queryClient = new QueryClient();
 
