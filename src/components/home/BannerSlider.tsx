@@ -89,10 +89,22 @@
    const currentBanner = banners[currentIndex];
  
    return (
-     <section className="relative min-h-[500px] lg:min-h-[600px] flex items-center justify-center overflow-hidden pt-20">
-       {/* Background */}
-       <div className="absolute inset-0 hero-gradient" />
-       <div className="absolute inset-0 hero-pattern" />
+      <section className="relative min-h-[500px] lg:min-h-[600px] flex items-center justify-center overflow-hidden pt-20">
+        {/* Background Image */}
+        {currentBanner.image_url ? (
+          <>
+            <div
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+              style={{ backgroundImage: `url(${currentBanner.image_url})` }}
+            />
+            <div className="absolute inset-0 bg-black/50" />
+          </>
+        ) : (
+          <>
+            <div className="absolute inset-0 hero-gradient" />
+            <div className="absolute inset-0 hero-pattern" />
+          </>
+        )}
        
        {/* Floating Elements */}
        <div className="absolute top-20 left-10 w-72 h-72 bg-primary-foreground/5 rounded-full blur-3xl animate-float" />
