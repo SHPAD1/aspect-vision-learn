@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.create-course-payment]
 verify_jwt = false
+
+[functions.razorpay-payment]
+verify_jwt = false
