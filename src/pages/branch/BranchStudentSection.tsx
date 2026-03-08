@@ -95,6 +95,7 @@ const BranchStudentSection = () => {
 
   useEffect(() => {
     fetchStudents();
+    fetchIdPermission();
   }, [branchInfo]);
 
   const fetchStudents = async () => {
