@@ -20,6 +20,7 @@ import {
   UsersRound,
   Newspaper,
   Shield,
+  Mail,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -69,6 +70,7 @@ const systemItems = [
   { icon: Building2, label: "Branches", href: "/admin/branches" },
   { icon: Shield, label: "Branch Permissions", href: "/admin/branch-permissions" },
   { icon: CreditCard, label: "Payment Settings", href: "/admin/payment-settings" },
+  { icon: Mail, label: "Email Settings", href: "/admin/email-settings" },
   { icon: Settings, label: "Settings", href: "/admin/settings" },
 ];
 

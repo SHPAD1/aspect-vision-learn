@@ -57,6 +57,7 @@ import AdminTeam from "./pages/admin/AdminTeam";
 import AdminBlog from "./pages/admin/AdminBlog";
 import AdminBranchPermissions from "./pages/admin/AdminBranchPermissions";
 import AdminPaymentSettings from "./pages/admin/AdminPaymentSettings";
+import AdminEmailSettings from "./pages/admin/AdminEmailSettings";
 // Sales pages
 import SalesDashboard from "./pages/sales/SalesDashboard";
 import SalesOverview from "./pages/sales/SalesOverview";
@@ -95,6 +96,7 @@ import BranchRequestSection from "./pages/branch/BranchRequestSection";
 import BranchReportGeneration from "./pages/branch/BranchReportGeneration";
 import BranchPerformanceDashboard from "./pages/branch/BranchPerformanceDashboard";
 import BranchSettings from "./pages/branch/BranchSettings";
+import BranchNotices from "./pages/branch/BranchNotices";
 
 const queryClient = new QueryClient();
 
@@ -157,6 +159,7 @@ const App = () => (
               <Route path="settings" element={<AdminSettings />} />
               <Route path="branch-permissions" element={<AdminBranchPermissions />} />
               <Route path="payment-settings" element={<AdminPaymentSettings />} />
+              <Route path="email-settings" element={<AdminEmailSettings />} />
             </Route>
             
             {/* Sales Dashboard */}
@@ -196,6 +199,7 @@ const App = () => (
               <Route path="analytics" element={<BranchAnalytics />} />
               <Route path="blog" element={<BranchBlog />} />
               <Route path="settings" element={<BranchSettings />} />
+              <Route path="notices" element={<BranchNotices />} />
             </Route>
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -17,6 +17,7 @@ import {
   FileText,
   Settings,
   Target,
+  Bell,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -64,6 +65,7 @@ const departmentItems = [
  
 const managementItems = [
   { icon: CreditCard, label: "Financial", href: "/branch/payments" },
+  { icon: Bell, label: "Notices", href: "/branch/notices" },
   { icon: UserCog, label: "User Management", href: "/branch/users" },
   { icon: ClipboardCheck, label: "Requests", href: "/branch/requests" },
   { icon: Settings, label: "Settings", href: "/branch/settings" },
