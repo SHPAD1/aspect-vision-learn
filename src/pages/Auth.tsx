@@ -23,13 +23,13 @@ const roleRoutes: Record<AppRole, string> = {
   student: "/dashboard",
 };
 
-const getRedirectRoute = (userRoles: AppRole[]): string => {
+const getRedirectRoute = (userRoles: AppRole[]): string | null => {
   for (const role of rolePriority) {
     if (userRoles.includes(role)) {
       return roleRoutes[role];
     }
   }
-  return "/dashboard";
+  return null;
 };
 
 const loginSchema = z.object({
@@ -49,18 +49,31 @@ const Auth = () => {
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        const { data: roles } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", session.user.id);
+      if (!session) return;
 
-        const userRoles = (roles?.map(r => r.role) || []) as AppRole[];
-        navigate(getRedirectRoute(userRoles));
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id);
+
+      const userRoles = (roles?.map((r) => r.role) || []) as AppRole[];
+      const redirectRoute = getRedirectRoute(userRoles);
+
+      if (!redirectRoute) {
+        await supabase.auth.signOut();
+        toast({
+          title: "Access setup required",
+          description: "Your account role is missing. Please contact admin.",
+          variant: "destructive",
+        });
+        return;
       }
+
+      navigate(redirectRoute, { replace: true });
     };
+
     checkSession();
-  }, [navigate]);
+  }, [navigate, toast]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,11 +105,16 @@ const Auth = () => {
         .select("role")
         .eq("user_id", data.user.id);
 
-      const userRoles = (roles?.map(r => r.role) || []) as AppRole[];
+      const userRoles = (roles?.map((r) => r.role) || []) as AppRole[];
       const redirectRoute = getRedirectRoute(userRoles);
 
+      if (!redirectRoute) {
+        await supabase.auth.signOut();
+        throw new Error("Your account role is missing. Please contact admin.");
+      }
+
       toast({ title: "Welcome back!", description: "Login successful." });
-      navigate(redirectRoute);
+      navigate(redirectRoute, { replace: true });
     } catch (error: any) {
       toast({
         title: "Login Failed",
