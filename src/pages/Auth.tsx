@@ -12,14 +12,12 @@ import type { Database } from "@/integrations/supabase/types";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
 
-// Role priority for redirect - highest priority role wins
 const rolePriority: AppRole[] = ["admin", "branch_admin", "teacher", "sales", "support", "student"];
 
-// Route mapping for each role
 const roleRoutes: Record<AppRole, string> = {
   admin: "/admin",
   branch_admin: "/branch",
-  teacher: "/dashboard", // TODO: Create teacher dashboard
+  teacher: "/dashboard",
   sales: "/sales",
   support: "/support",
   student: "/dashboard",
@@ -31,7 +29,7 @@ const getRedirectRoute = (userRoles: AppRole[]): string => {
       return roleRoutes[role];
     }
   }
-  return "/dashboard"; // Default fallback
+  return "/dashboard";
 };
 
 const loginSchema = z.object({
@@ -39,43 +37,26 @@ const loginSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-type RoleType = "student" | "sales" | "support" | "teacher" | "branch_admin" | "admin";
-
-const roleConfig: Record<RoleType, { label: string; description: string }> = {
-  student: { label: "Student", description: "Access your courses and learning materials" },
-  sales: { label: "Sales", description: "Manage leads and enrollments" },
-  support: { label: "Support", description: "Handle student queries and tickets" },
-  teacher: { label: "Teacher", description: "Teach courses and manage materials" },
-  branch_admin: { label: "Branch Admin", description: "Manage your branch operations" },
-  admin: { label: "Admin", description: "Full system administration" },
-};
-
 const Auth = () => {
-  const [selectedRole, setSelectedRole] = useState<RoleType>("student");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
   const [loginData, setLoginData] = useState({ email: "", password: "" });
-  
+
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Check if already logged in
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        // Check user role and redirect accordingly
         const { data: roles } = await supabase
           .from("user_roles")
           .select("role")
           .eq("user_id", session.user.id);
-        
+
         const userRoles = (roles?.map(r => r.role) || []) as AppRole[];
-        
-        const redirectRoute = getRedirectRoute(userRoles);
-        navigate(redirectRoute);
+        navigate(getRedirectRoute(userRoles));
       }
     };
     checkSession();
@@ -112,29 +93,10 @@ const Auth = () => {
         .eq("user_id", data.user.id);
 
       const userRoles = (roles?.map(r => r.role) || []) as AppRole[];
-      
-      // Validate that user has the selected role (or any role if selected doesn't match)
-      const hasSelectedRole = userRoles.includes(selectedRole as AppRole);
+      const redirectRoute = getRedirectRoute(userRoles);
 
       toast({ title: "Welcome back!", description: "Login successful." });
-      
-      // If user has the selected role, go to that dashboard
-      // Otherwise, redirect based on their highest priority role
-      if (hasSelectedRole) {
-        navigate(roleRoutes[selectedRole as AppRole]);
-      } else {
-        const redirectRoute = getRedirectRoute(userRoles);
-        navigate(redirectRoute);
-        
-        // Optionally notify if role doesn't match
-        if (userRoles.length > 0) {
-          toast({
-            title: "Role Mismatch",
-            description: `You don't have ${selectedRole} access. Redirecting to your dashboard.`,
-            variant: "default",
-          });
-        }
-      }
+      navigate(redirectRoute);
     } catch (error: any) {
       toast({
         title: "Login Failed",
@@ -158,15 +120,15 @@ const Auth = () => {
               Aspect Vision
             </span>
           </Link>
-          
+
           <h1 className="font-heading text-4xl xl:text-5xl font-bold text-primary-foreground leading-tight mb-6">
             Transform Your Career with Industry-Ready Skills
           </h1>
-          
+
           <p className="text-lg text-primary-foreground/80 max-w-lg">
             Join thousands of students who've launched successful careers through our expert-led programs.
           </p>
-          
+
           <div className="mt-12 flex items-center gap-8">
             <div>
               <p className="font-heading text-3xl font-bold text-primary-foreground">10,000+</p>
@@ -179,8 +141,7 @@ const Auth = () => {
             </div>
           </div>
         </div>
-        
-        {/* Decorative elements */}
+
         <div className="absolute top-20 right-10 w-72 h-72 bg-primary-foreground/5 rounded-full blur-3xl" />
         <div className="absolute bottom-20 left-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
       </div>
@@ -199,29 +160,6 @@ const Auth = () => {
           <div className="mb-8 text-center">
             <h2 className="font-heading text-2xl font-bold text-foreground mb-2">Welcome Back</h2>
             <p className="text-muted-foreground">Sign in to your account</p>
-          </div>
-
-          {/* Role Selector */}
-          <div className="mb-8">
-            <p className="text-sm text-muted-foreground mb-3">Login as:</p>
-            <div className="grid grid-cols-2 gap-2">
-              {(Object.keys(roleConfig) as RoleType[]).map((role) => (
-                <button
-                  key={role}
-                  onClick={() => setSelectedRole(role)}
-                  className={`p-3 rounded-xl text-left transition-all ${
-                    selectedRole === role
-                      ? "bg-primary text-primary-foreground shadow-lg"
-                      : "bg-muted hover:bg-muted/80 text-foreground"
-                  }`}
-                >
-                  <p className="font-medium text-sm">{roleConfig[role].label}</p>
-                  <p className={`text-xs ${selectedRole === role ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                    {roleConfig[role].description}
-                  </p>
-                </button>
-              ))}
-            </div>
           </div>
 
           {/* Login Form */}
