@@ -20,6 +20,7 @@ import {
   UsersRound,
   Newspaper,
   Shield,
+  Mail,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
