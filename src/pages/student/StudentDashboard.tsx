@@ -30,7 +30,17 @@ const sidebarLinks = [
 ];
 
 const StudentDashboard = () => {
-  const { user, loading, isAdmin, signOut } = useAuth();
+  const {
+    user,
+    loading,
+    isAdmin,
+    isStudent,
+    isTeacher,
+    isBranchAdmin,
+    isSales,
+    isSupport,
+    signOut,
+  } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -39,11 +49,42 @@ const StudentDashboard = () => {
   useEffect(() => {
     if (!loading && !user) {
       navigate("/auth");
+      return;
     }
+
     if (!loading && user && isAdmin) {
       navigate("/admin");
+      return;
     }
-  }, [loading, user, isAdmin, navigate]);
+
+    if (!loading && user && !isStudent && !isTeacher) {
+      if (isBranchAdmin) {
+        navigate("/branch");
+      } else if (isSales) {
+        navigate("/sales");
+      } else if (isSupport) {
+        navigate("/support");
+      } else {
+        toast({
+          title: "Access setup required",
+          description: "Your account role is missing. Please contact admin.",
+          variant: "destructive",
+        });
+        navigate("/auth");
+      }
+    }
+  }, [
+    loading,
+    user,
+    isAdmin,
+    isStudent,
+    isTeacher,
+    isBranchAdmin,
+    isSales,
+    isSupport,
+    navigate,
+    toast,
+  ]);
 
   const handleLogout = async () => {
     await signOut();

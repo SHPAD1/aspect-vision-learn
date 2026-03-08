@@ -105,11 +105,16 @@ const Auth = () => {
         .select("role")
         .eq("user_id", data.user.id);
 
-      const userRoles = (roles?.map(r => r.role) || []) as AppRole[];
+      const userRoles = (roles?.map((r) => r.role) || []) as AppRole[];
       const redirectRoute = getRedirectRoute(userRoles);
 
+      if (!redirectRoute) {
+        await supabase.auth.signOut();
+        throw new Error("Your account role is missing. Please contact admin.");
+      }
+
       toast({ title: "Welcome back!", description: "Login successful." });
-      navigate(redirectRoute);
+      navigate(redirectRoute, { replace: true });
     } catch (error: any) {
       toast({
         title: "Login Failed",
