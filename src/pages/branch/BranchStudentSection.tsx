@@ -98,6 +98,21 @@ const BranchStudentSection = () => {
     fetchIdPermission();
   }, [branchInfo]);
 
+  const fetchIdPermission = async () => {
+    if (!branchInfo?.id) return;
+    try {
+      const { data } = await supabase
+        .from("branch_permissions")
+        .select("can_create_ids")
+        .eq("branch_id", branchInfo.id)
+        .eq("can_create_ids", true)
+        .limit(1);
+      setCanCreateIds((data && data.length > 0) || false);
+    } catch (error) {
+      console.error("Error checking ID permission:", error);
+    }
+  };
+
   const fetchStudents = async () => {
     if (!branchInfo?.id) return;
 
