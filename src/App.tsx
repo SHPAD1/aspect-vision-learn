@@ -57,6 +57,7 @@ import AdminTeam from "./pages/admin/AdminTeam";
 import AdminBlog from "./pages/admin/AdminBlog";
 import AdminBranchPermissions from "./pages/admin/AdminBranchPermissions";
 import AdminPaymentSettings from "./pages/admin/AdminPaymentSettings";
+import AdminEmailSettings from "./pages/admin/AdminEmailSettings";
 // Sales pages
 import SalesDashboard from "./pages/sales/SalesDashboard";
 import SalesOverview from "./pages/sales/SalesOverview";
