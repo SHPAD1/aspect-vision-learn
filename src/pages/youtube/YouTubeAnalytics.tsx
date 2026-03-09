@@ -17,7 +17,7 @@ const YouTubeAnalytics = () => {
   ).map(([name, value]) => ({ name, value }));
 
   const monthlyData = Object.entries(
-    videos.reduce((acc, v) => {
+    videos.reduce((acc: Record<string, { views: number; videos: number; revenue: number }>, v) => {
       const m = new Date(v.posted_date).toLocaleDateString("en-IN", { year: "numeric", month: "short" });
       if (!acc[m]) acc[m] = { views: 0, videos: 0, revenue: 0 };
       acc[m].views += v.views_count || 0;
