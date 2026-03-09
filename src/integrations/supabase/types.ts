@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_metrics: {
+        Row: {
+          branch_id: string | null
+          created_at: string
+          id: string
+          metric_date: string
+          metric_type: string
+          metric_value: number
+          notes: string | null
+          recorded_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          branch_id?: string | null
+          created_at?: string
+          id?: string
+          metric_date?: string
+          metric_type: string
+          metric_value?: number
+          notes?: string | null
+          recorded_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          branch_id?: string | null
+          created_at?: string
+          id?: string
+          metric_date?: string
+          metric_type?: string
+          metric_value?: number
+          notes?: string | null
+          recorded_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_metrics_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       banners: {
         Row: {
           button_link: string | null
@@ -52,6 +96,69 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      batch_sales_records: {
+        Row: {
+          batch_id: string
+          branch_id: string
+          created_at: string
+          discount_given: number | null
+          id: string
+          notes: string | null
+          payment_mode: string | null
+          recorded_by: string | null
+          revenue_collected: number
+          sale_date: string
+          status: string
+          students_enrolled: number
+          updated_at: string
+        }
+        Insert: {
+          batch_id: string
+          branch_id: string
+          created_at?: string
+          discount_given?: number | null
+          id?: string
+          notes?: string | null
+          payment_mode?: string | null
+          recorded_by?: string | null
+          revenue_collected?: number
+          sale_date?: string
+          status?: string
+          students_enrolled?: number
+          updated_at?: string
+        }
+        Update: {
+          batch_id?: string
+          branch_id?: string
+          created_at?: string
+          discount_given?: number | null
+          id?: string
+          notes?: string | null
+          payment_mode?: string | null
+          recorded_by?: string | null
+          revenue_collected?: number
+          sale_date?: string
+          status?: string
+          students_enrolled?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "batch_sales_records_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batch_sales_records_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       batches: {
         Row: {
@@ -986,6 +1093,98 @@ export type Database = {
         }
         Relationships: []
       }
+      youtube_videos: {
+        Row: {
+          branch_id: string | null
+          category: string | null
+          comments_count: number | null
+          created_at: string
+          creator_id: string | null
+          creator_name: string
+          currency: string | null
+          description: string | null
+          duration_seconds: number | null
+          id: string
+          is_monetized: boolean | null
+          likes_count: number | null
+          notes: string | null
+          posted_date: string
+          revenue_generated: number | null
+          status: string
+          subscribers_gained: number | null
+          tags: string[] | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          video_url: string
+          views_count: number | null
+          watch_hours: number | null
+          youtube_video_id: string | null
+        }
+        Insert: {
+          branch_id?: string | null
+          category?: string | null
+          comments_count?: number | null
+          created_at?: string
+          creator_id?: string | null
+          creator_name: string
+          currency?: string | null
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          is_monetized?: boolean | null
+          likes_count?: number | null
+          notes?: string | null
+          posted_date?: string
+          revenue_generated?: number | null
+          status?: string
+          subscribers_gained?: number | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          video_url: string
+          views_count?: number | null
+          watch_hours?: number | null
+          youtube_video_id?: string | null
+        }
+        Update: {
+          branch_id?: string | null
+          category?: string | null
+          comments_count?: number | null
+          created_at?: string
+          creator_id?: string | null
+          creator_name?: string
+          currency?: string | null
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          is_monetized?: boolean | null
+          likes_count?: number | null
+          notes?: string | null
+          posted_date?: string
+          revenue_generated?: number | null
+          status?: string
+          subscribers_gained?: number | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          video_url?: string
+          views_count?: number | null
+          watch_hours?: number | null
+          youtube_video_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youtube_videos_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -1007,6 +1206,8 @@ export type Database = {
         | "support"
         | "teacher"
         | "branch_admin"
+        | "youtube_manager"
+        | "app_manager"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1141,6 +1342,8 @@ export const Constants = {
         "support",
         "teacher",
         "branch_admin",
+        "youtube_manager",
+        "app_manager",
       ],
     },
   },
