@@ -98,6 +98,26 @@ import BranchPerformanceDashboard from "./pages/branch/BranchPerformanceDashboar
 import BranchSettings from "./pages/branch/BranchSettings";
 import BranchNotices from "./pages/branch/BranchNotices";
 
+// YouTube Manager pages
+import YouTubeDashboard from "./pages/youtube/YouTubeDashboard";
+import YouTubeOverview from "./pages/youtube/YouTubeOverview";
+import YouTubeProfile from "./pages/youtube/YouTubeProfile";
+import YouTubeVideos from "./pages/youtube/YouTubeVideos";
+import YouTubeAddVideo from "./pages/youtube/YouTubeAddVideo";
+import YouTubeAnalytics from "./pages/youtube/YouTubeAnalytics";
+import YouTubeRevenue from "./pages/youtube/YouTubeRevenue";
+import YouTubePerformance from "./pages/youtube/YouTubePerformance";
+
+// App Manager pages
+import AppManagerDashboard from "./pages/appmanager/AppManagerDashboard";
+import AppManagerOverview from "./pages/appmanager/AppManagerOverview";
+import AppManagerProfile from "./pages/appmanager/AppManagerProfile";
+import AppManagerSales from "./pages/appmanager/AppManagerSales";
+import AppManagerBatches from "./pages/appmanager/AppManagerBatches";
+import AppManagerAnalytics from "./pages/appmanager/AppManagerAnalytics";
+import AppManagerMetrics from "./pages/appmanager/AppManagerMetrics";
+import AppManagerReports from "./pages/appmanager/AppManagerReports";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -200,6 +220,28 @@ const App = () => (
               <Route path="blog" element={<BranchBlog />} />
               <Route path="settings" element={<BranchSettings />} />
               <Route path="notices" element={<BranchNotices />} />
+            </Route>
+
+            {/* YouTube Manager Dashboard */}
+            <Route path="/youtube" element={<YouTubeDashboard />}>
+              <Route index element={<YouTubeOverview />} />
+              <Route path="profile" element={<YouTubeProfile />} />
+              <Route path="videos" element={<YouTubeVideos />} />
+              <Route path="add" element={<YouTubeAddVideo />} />
+              <Route path="analytics" element={<YouTubeAnalytics />} />
+              <Route path="revenue" element={<YouTubeRevenue />} />
+              <Route path="performance" element={<YouTubePerformance />} />
+            </Route>
+
+            {/* App Manager Dashboard */}
+            <Route path="/appmanager" element={<AppManagerDashboard />}>
+              <Route index element={<AppManagerOverview />} />
+              <Route path="profile" element={<AppManagerProfile />} />
+              <Route path="sales" element={<AppManagerSales />} />
+              <Route path="batches" element={<AppManagerBatches />} />
+              <Route path="analytics" element={<AppManagerAnalytics />} />
+              <Route path="metrics" element={<AppManagerMetrics />} />
+              <Route path="reports" element={<AppManagerReports />} />
             </Route>
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
