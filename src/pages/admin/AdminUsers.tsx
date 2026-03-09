@@ -99,6 +99,8 @@ const roleColors: Record<AppRole, string> = {
   sales: "bg-success/10 text-success",
   support: "bg-primary/10 text-primary",
   student: "bg-muted text-muted-foreground",
+  youtube_manager: "bg-destructive/10 text-destructive",
+  app_manager: "bg-primary/10 text-primary",
 };
 
 const AdminUsers = () => {

@@ -11,7 +11,7 @@ const YouTubePerformance = () => {
   }, []);
 
   const creatorData = Object.entries(
-    videos.reduce((acc, v) => {
+    videos.reduce((acc: Record<string, { videos: number; views: number; revenue: number; likes: number }>, v) => {
       const c = v.creator_name;
       if (!acc[c]) acc[c] = { videos: 0, views: 0, revenue: 0, likes: 0 };
       acc[c].videos += 1;
@@ -19,8 +19,8 @@ const YouTubePerformance = () => {
       acc[c].revenue += Number(v.revenue_generated || 0);
       acc[c].likes += v.likes_count || 0;
       return acc;
-    }, {} as Record<string, any>)
-  ).map(([creator, d]) => ({ creator, ...d })).sort((a, b) => b.views - a.views);
+    }, {})
+  ).map(([creator, d]) => ({ creator, videos: d.videos, views: d.views, revenue: d.revenue, likes: d.likes })).sort((a, b) => b.views - a.views);
 
   const avgEngagement = videos.length > 0
     ? ((videos.reduce((s, v) => s + (v.likes_count || 0) + (v.comments_count || 0), 0)) / videos.reduce((s, v) => s + (v.views_count || 1), 0) * 100).toFixed(2)

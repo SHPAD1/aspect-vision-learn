@@ -36,7 +36,7 @@ const AppManagerAnalytics = () => {
       acc[m].students += s.students_enrolled || 0;
       return acc;
     }, {})
-  ).map(([month, d]) => ({ month, revenue: d.revenue, students: d.students }));
+  ).map(([month, d]) => ({ month, revenue: (d as { revenue: number; students: number }).revenue, students: (d as { revenue: number; students: number }).students }));
 
   const paymentModeData = Object.entries(
     sales.reduce((acc: Record<string, number>, s) => { acc[s.payment_mode || "other"] = (acc[s.payment_mode || "other"] || 0) + 1; return acc; }, {})

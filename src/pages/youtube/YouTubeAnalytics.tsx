@@ -24,8 +24,8 @@ const YouTubeAnalytics = () => {
       acc[m].videos += 1;
       acc[m].revenue += Number(v.revenue_generated || 0);
       return acc;
-    }, {} as Record<string, any>)
-  ).map(([month, d]) => ({ month, ...d })).slice(-12);
+    }, {})
+  ).map(([month, d]) => ({ month, views: d.views, videos: d.videos, revenue: d.revenue })).slice(-12);
 
   const topVideos = [...videos].sort((a, b) => (b.views_count || 0) - (a.views_count || 0)).slice(0, 10).map((v) => ({ name: v.title.substring(0, 25), views: v.views_count || 0 }));
 

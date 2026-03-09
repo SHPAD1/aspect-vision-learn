@@ -12,11 +12,13 @@ import type { Database } from "@/integrations/supabase/types";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
 
-const rolePriority: AppRole[] = ["admin", "branch_admin", "teacher", "sales", "support", "student"];
+const rolePriority: AppRole[] = ["admin", "branch_admin", "youtube_manager", "app_manager", "teacher", "sales", "support", "student"];
 
 const roleRoutes: Record<AppRole, string> = {
   admin: "/admin",
   branch_admin: "/branch",
+  youtube_manager: "/youtube",
+  app_manager: "/appmanager",
   teacher: "/dashboard",
   sales: "/sales",
   support: "/support",

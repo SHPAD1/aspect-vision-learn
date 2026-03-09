@@ -25,7 +25,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Role priority for determining primary dashboard
-const rolePriority: AppRole[] = ["admin", "branch_admin", "teacher", "sales", "support", "student"];
+const rolePriority: AppRole[] = ["admin", "branch_admin", "youtube_manager", "app_manager", "teacher", "sales", "support", "student"];
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
