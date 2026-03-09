@@ -20,7 +20,10 @@ const YouTubePerformance = () => {
       acc[c].likes += v.likes_count || 0;
       return acc;
     }, {})
-  ).map(([creator, d]) => ({ creator, videos: d.videos, views: d.views, revenue: d.revenue, likes: d.likes })).sort((a, b) => b.views - a.views);
+  ).map(([creator, d]) => {
+    const data = d as { videos: number; views: number; revenue: number; likes: number };
+    return { creator, videos: data.videos, views: data.views, revenue: data.revenue, likes: data.likes };
+  }).sort((a, b) => b.views - a.views);
 
   const avgEngagement = videos.length > 0
     ? ((videos.reduce((s, v) => s + (v.likes_count || 0) + (v.comments_count || 0), 0)) / videos.reduce((s, v) => s + (v.views_count || 1), 0) * 100).toFixed(2)

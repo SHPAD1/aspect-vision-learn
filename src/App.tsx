@@ -221,6 +221,28 @@ const App = () => (
               <Route path="settings" element={<BranchSettings />} />
               <Route path="notices" element={<BranchNotices />} />
             </Route>
+
+            {/* YouTube Manager Dashboard */}
+            <Route path="/youtube" element={<YouTubeDashboard />}>
+              <Route index element={<YouTubeOverview />} />
+              <Route path="profile" element={<YouTubeProfile />} />
+              <Route path="videos" element={<YouTubeVideos />} />
+              <Route path="add" element={<YouTubeAddVideo />} />
+              <Route path="analytics" element={<YouTubeAnalytics />} />
+              <Route path="revenue" element={<YouTubeRevenue />} />
+              <Route path="performance" element={<YouTubePerformance />} />
+            </Route>
+
+            {/* App Manager Dashboard */}
+            <Route path="/appmanager" element={<AppManagerDashboard />}>
+              <Route index element={<AppManagerOverview />} />
+              <Route path="profile" element={<AppManagerProfile />} />
+              <Route path="sales" element={<AppManagerSales />} />
+              <Route path="batches" element={<AppManagerBatches />} />
+              <Route path="analytics" element={<AppManagerAnalytics />} />
+              <Route path="metrics" element={<AppManagerMetrics />} />
+              <Route path="reports" element={<AppManagerReports />} />
+            </Route>
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
